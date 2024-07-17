@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 
 @RestController
 @RequiredArgsConstructor
@@ -28,7 +30,7 @@ public class ApiController {
     }
 
     @PostMapping("/settings{id}")
-    public ResponseEntity<?> createNotificationSettings(@PathVariable("id") String id) {
+    public ResponseEntity<?> createNotificationSettings(@PathVariable("id") UUID id) {
         return ResponseEntity.ok(true);
     }
 
@@ -43,7 +45,7 @@ public class ApiController {
     }
 
     @GetMapping("/count")
-    public ResponseEntity<?> getEventsCount() {
+    public ResponseEntity<NotificationCountDto> getEventsCount() {
         return ResponseEntity.ok(null);
     }
 }
