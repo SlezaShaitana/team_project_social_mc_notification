@@ -17,7 +17,7 @@ public class NotificationEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private UUID id;
-    @Column(name = "author_id")
+    @Column(name = "author_id", nullable = false)
     private UUID authorId;
     @Column(name = "content")
     private String content;
