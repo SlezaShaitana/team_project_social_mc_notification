@@ -1,0 +1,12 @@
+version: '3.8'
+services:
+  postgres:
+    container_name: pg_container_for_mc
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: mcnotification
+    ports:
+      - "5432:5432"

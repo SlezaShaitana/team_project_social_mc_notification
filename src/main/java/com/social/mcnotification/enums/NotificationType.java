@@ -1,4 +1,4 @@
-package com.social.mcnotification.dto;
+package com.social.mcnotification.enums;
 
 public enum NotificationType {
     LIKE,

@@ -1,31 +1,57 @@
 package com.social.mcnotification.model;
 
-import com.social.mcnotification.dto.NotificationType;
+import com.social.mcnotification.enums.MicroServiceName;
+import com.social.mcnotification.enums.NotificationType;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
-@Setter
-@Getter
+@Data
+@NoArgsConstructor
 @Entity
-@Table(name = "notification")
+@Table(name = "notifications")
 public class NotificationEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", columnDefinition = "uuid", nullable = false)
     private UUID id;
     @Column(name = "author_id", nullable = false)
     private UUID authorId;
+    @Column(name = "receiver_id")
+    private UUID receiverId;
     @Column(name = "content")
     private String content;
     @Column(name = "notification_type",
-            columnDefinition = "ENUM('LIKE', 'POST', 'POST_COMMENT', 'COMMENT_COMMENT'," +
-                    " 'MESSAGE', 'FRIEND_REQUEST', 'FRIEND_BIRTHDAY', 'SEND_EMAIL_MESSAGE')",
+//            columnDefinition = "ENUM('LIKE', 'POST', 'POST_COMMENT', 'COMMENT_COMMENT'," +
+//                    " 'MESSAGE', 'FRIEND_REQUEST', 'FRIEND_BIRTHDAY', 'SEND_EMAIL_MESSAGE')",
             nullable = false)
+    @Enumerated(EnumType.STRING)
     private NotificationType notificationType;
-    @Column(name = "sent_time", columnDefinition = "DATETIME", nullable = false)
-    private LocalDateTime sentTime;
+    @Column(name = "service_name")
+    @Enumerated(EnumType.STRING)
+    private MicroServiceName serviceName;
+    // из какого микросервиса отправлено
+    @Column(name = "sent_time", columnDefinition = "TIMESTAMP", nullable = false)
+    private Timestamp sentTime;
+    @Column(name = "event_id")
+    private UUID eventId;
+    @Column(name = "is_readed")
+    private Boolean isReaded;
+    @OneToMany(mappedBy = "notificationEntities", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<NotificationSettingEntity> notificationSettings = new ArrayList<>();
 }
+
+
+
+
+
+
+
+
+
+

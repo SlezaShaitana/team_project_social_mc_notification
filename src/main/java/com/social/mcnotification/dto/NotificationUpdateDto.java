@@ -1,5 +1,6 @@
 package com.social.mcnotification.dto;
 
+import com.social.mcnotification.enums.NotificationType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
