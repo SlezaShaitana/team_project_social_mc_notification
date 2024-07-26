@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -109,8 +110,10 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public NotificationCountDto getEventsCount() {
+        List<NotificationEntity> notifications = notificationRepository.findById(id);
+        Count count = new Count(notifications.size());
         logger.log(Level.INFO, "Count notifications for the user: {}");
-        return null;
+        return new NotificationCountDto(LocalDateTime.now(), count);
     }
 
 
