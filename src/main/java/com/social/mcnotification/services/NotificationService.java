@@ -2,6 +2,7 @@ package com.social.mcnotification.services;
 
 import com.social.mcnotification.dto.*;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface NotificationService {
@@ -12,11 +13,11 @@ public interface NotificationService {
 
     void markAllEventsAsRead();
 
-    void createNotificationSettings(UUID id);
+    Boolean createNotificationSettings(UUID id);
 
-    void createEvent(EventNotificationDto eventNotificationDto);
+    void createNotification(EventNotificationDto eventNotificationDto);
 
-    PageNotificationsDto getEvents(Pageable page);
+    PageNotificationsDto getNotifications(int page, int size, List<String> sort, Pageable pageable);
 
     NotificationCountDto getEventsCount();
 }

@@ -31,8 +31,5 @@ public class NotificationSettingEntity {
     private boolean enableFriendBirthday;
     @Column(name = "enable_send_email_message")
     private boolean enableSendEmailMessage;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "notification_id", nullable = false)
-    private NotificationEntity notificationEntities;
 
 }

@@ -27,8 +27,6 @@ public class NotificationEntity {
     @Column(name = "content")
     private String content;
     @Column(name = "notification_type",
-//            columnDefinition = "ENUM('LIKE', 'POST', 'POST_COMMENT', 'COMMENT_COMMENT'," +
-//                    " 'MESSAGE', 'FRIEND_REQUEST', 'FRIEND_BIRTHDAY', 'SEND_EMAIL_MESSAGE')",
             nullable = false)
     @Enumerated(EnumType.STRING)
     private NotificationType notificationType;
@@ -42,8 +40,6 @@ public class NotificationEntity {
     private UUID eventId;
     @Column(name = "is_readed")
     private Boolean isReaded;
-    @OneToMany(mappedBy = "notificationEntities", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private List<NotificationSettingEntity> notificationSettings = new ArrayList<>();
 }
 
 
