@@ -21,6 +21,12 @@ public class KafkaMessageService {
     private final List<NotificationDto> messages = new ArrayList<>();
 
     public void savingToNotificationRepository(NotificationDto notificationDto) {
+        //Смотреть откуда пришло
+
+        //Пример: пришла из постов
+        //принимаешь это сообщение
+        //смотришь друзей этого пользователя --> friends
+        //сохраняешь в БД столько уведомлений, сколько у пользователя друзей, меняя толкьо receiverId
         notificationRepository.save(mapper.mapToNotificationEntity(notificationDto));
     }
 
