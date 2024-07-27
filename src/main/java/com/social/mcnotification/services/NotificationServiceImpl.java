@@ -30,8 +30,8 @@ public class NotificationServiceImpl implements NotificationService {
 
     private final UUID id = UUID.randomUUID(); //test
 
-    @Value("${app.kafka.MessageTopic}")
-    private String topicName;
+//    @Value("${app.kafka.MessageTopic}")
+//    private String topicName;
 
     private NotificationRepository notificationRepository;
     private NotificationSettingRepository notificationSettingRepository;
