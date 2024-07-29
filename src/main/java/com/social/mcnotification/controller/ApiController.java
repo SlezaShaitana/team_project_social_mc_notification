@@ -5,6 +5,7 @@ import com.social.mcnotification.services.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,11 +20,13 @@ public class ApiController {
     private final NotificationService notificationService;
 
     @GetMapping("/settings")
+    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')")
     public ResponseEntity<NotificationSettingDto> getNotificationSettings() {
         return ResponseEntity.ok(notificationService.getNotificationSettings());
     }
 
     @PutMapping("/settings")
+    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')")
     public ResponseEntity<?> updateNotificationSettings(@RequestBody NotificationUpdateDto notificationUpdateDto) {
         notificationService.updateNotificationSettings(notificationUpdateDto);
         return new ResponseEntity<>(HttpStatus.OK);
@@ -31,23 +34,27 @@ public class ApiController {
     }
 
     @PutMapping("/readed")
+    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')")
     public ResponseEntity<String> markAllEventsAsRead() {
         notificationService.markAllEventsAsRead();
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/settings{id}")
+    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')")
     public ResponseEntity<Boolean> createNotificationSettings(@PathVariable("id") UUID id) {
         return ResponseEntity.ok(notificationService.createNotificationSettings(id));
     }
 
     @PostMapping("/add")
+    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')")
     public ResponseEntity<?> createNotification(@RequestBody EventNotificationDto eventNotificationDto) {
         notificationService.createNotification(eventNotificationDto);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("/notifications")
+    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')")
     public ResponseEntity<PageNotificationsDto> getNotifications(@RequestParam("page") int page,
                                                                  @RequestParam("size") int size,
                                                                  @RequestParam("sort") List<String> sort,
@@ -56,6 +63,7 @@ public class ApiController {
     }
 
     @GetMapping("/count")
+    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')")
     public ResponseEntity<NotificationCountDto> getEventsCount() {
         return ResponseEntity.ok(notificationService.getEventsCount());
     }

@@ -1,10 +1,15 @@
 package com.social.mcnotification.kafka.service;
 
+import com.social.mcnotification.client.FriendClient;
 import com.social.mcnotification.dto.NotificationDto;
 import com.social.mcnotification.dto.NotificationSettingDto;
 import com.social.mcnotification.repository.NotificationRepository;
 import com.social.mcnotification.services.helper.Mapper;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -15,8 +20,11 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Service
 public class KafkaMessageService {
+
     private Mapper mapper;
     private final NotificationRepository notificationRepository;
+
+    private FriendClient friendClient;
 
     private final List<NotificationDto> messages = new ArrayList<>();
 

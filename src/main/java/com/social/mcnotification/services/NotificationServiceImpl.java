@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -46,6 +47,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public void updateNotificationSettings(NotificationUpdateDto notificationUpdateDto) {
+        logger.log(Level.INFO, "Update notification settings for user: {}");
         NotificationSettingEntity notificationSettingEntity = notificationSettingRepository.findById(id);
 
         switch (notificationUpdateDto.getNotificationType()) {
@@ -56,13 +58,10 @@ public class NotificationServiceImpl implements NotificationService {
             case MESSAGE -> notificationSettingEntity.setEnableMessage(notificationUpdateDto.isEnable());
             case FRIEND_REQUEST -> notificationSettingEntity.setEnableFriendRequest(notificationUpdateDto.isEnable());
             case FRIEND_BIRTHDAY -> notificationSettingEntity.setEnableFriendBirthday(notificationUpdateDto.isEnable());
-            case SEND_EMAIL_MESSAGE ->
-                    notificationSettingEntity.setEnableSendEmailMessage(notificationUpdateDto.isEnable());
+            case SEND_EMAIL_MESSAGE -> notificationSettingEntity.setEnableSendEmailMessage(notificationUpdateDto.isEnable());
         }
 
         notificationSettingRepository.save(notificationSettingEntity);
-
-        logger.log(Level.INFO, "Update notification settings for user: {}");
 
     }
 
@@ -111,7 +110,11 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public NotificationCountDto getEventsCount() {
         List<NotificationEntity> notifications = notificationRepository.findById(id);
-        Count count = new Count(notifications.size());
+        List<NotificationEntity> unreadNotifications = notifications.stream()
+                .filter(notification -> !notification.getIsReaded() || notification.getIsReaded() == null)
+                .toList();
+
+        Count count = new Count(unreadNotifications.size());
         logger.log(Level.INFO, "Count notifications for the user: {}");
         return new NotificationCountDto(LocalDateTime.now(), count);
     }
