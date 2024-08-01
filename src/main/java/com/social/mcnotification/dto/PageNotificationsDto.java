@@ -2,6 +2,7 @@ package com.social.mcnotification.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @Setter
+@NoArgsConstructor
 public class PageNotificationsDto {
     private Integer totalPages;
     private Integer totalElements;

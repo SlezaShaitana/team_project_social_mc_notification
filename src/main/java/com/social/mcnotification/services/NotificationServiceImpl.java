@@ -1,35 +1,31 @@
 package com.social.mcnotification.services;
 
 import com.social.mcnotification.dto.*;
-import com.social.mcnotification.enums.NotificationType;
-import com.social.mcnotification.exceptions.SettingsAlreadyCreatedException;
-import com.social.mcnotification.kafka.service.KafkaMessageService;
 import com.social.mcnotification.model.NotificationEntity;
 import com.social.mcnotification.model.NotificationSettingEntity;
 import com.social.mcnotification.repository.NotificationRepository;
 import com.social.mcnotification.repository.NotificationSettingRepository;
 import com.social.mcnotification.services.helper.Mapper;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class NotificationServiceImpl implements NotificationService {
 
     private final UUID id = UUID.randomUUID(); //test
+    private final int LIMIT = 10;
+    private int offset;
+    private List<NotificationsDto> notificationsDtoList;
+    private int totalPages;
+    private int number;
 
 //    @Value("${app.kafka.MessageTopic}")
 //    private String topicName;
@@ -101,11 +97,77 @@ public class NotificationServiceImpl implements NotificationService {
 
     }
 
+
+    public List<NotificationDto> getNotificationDtoList() {
+        List<NotificationEntity> notifications = notificationRepository.findById(id);
+        return notifications.stream()
+                .map(notificationEntity -> mapper.mapToNotificationDto(notificationEntity))
+                .toList();
+    }
+
+    public List<NotificationsDto> getNotificationsDtoList() {
+        List<NotificationDto> notificationDtoList = getNotificationDtoList();
+        return notificationDtoList.stream()
+                .map(notification -> new NotificationsDto(notification.getSentTime(), notification)).toList();
+    }
+
+    public PageableObject getPageableObject(Sort sortCriteria, int size) {
+        PageableObject pageableObject = new PageableObject();
+        pageableObject.setOffset(offset);
+        pageableObject.setSort(sortCriteria);
+        pageableObject.setPaged(true);
+        pageableObject.setPageSize(size);
+        pageableObject.setUnpaged(true);
+        pageableObject.setPageNumber(number);
+        return pageableObject;
+    }
+
+    public Sort getSortCriteria(List<String> sort) {
+        return new Sort(
+                Boolean.parseBoolean(sort.get(0)),
+                Boolean.parseBoolean(sort.get(0)),
+                Boolean.parseBoolean(sort.get(0))); // ???
+    }
+
+    public PageNotificationsDto getPageNotificationsDto(int size, List<NotificationsDto> notificationsDtoSublist, Sort sortCriteria) {
+        PageNotificationsDto pageNotificationsDto = new PageNotificationsDto();
+        pageNotificationsDto.setTotalPages(totalPages);
+        pageNotificationsDto.setTotalElements(getNotificationsDtoList().size());
+        pageNotificationsDto.setNumber(number);
+        pageNotificationsDto.setSize(size);
+        pageNotificationsDto.setContent(notificationsDtoSublist);
+        pageNotificationsDto.setSort(sortCriteria);
+        pageNotificationsDto.setFirst(number == 0);
+        pageNotificationsDto.setLast(number == totalPages);
+        pageNotificationsDto.setNumberOfElements(
+                notificationsDtoSublist.size() - LIMIT == 0 ? LIMIT : notificationsDtoSublist.size() - LIMIT);
+
+        PageableObject pageableObject = getPageableObject(sortCriteria, notificationsDtoSublist.size());
+        pageNotificationsDto.setPageable(pageableObject);
+        pageNotificationsDto.setEmpty(notificationsDtoList.isEmpty());
+        return pageNotificationsDto;
+    }
+
+
     @Override
     public PageNotificationsDto getNotifications(int page, int size, List<String> sort, Pageable pageable) {
-        logger.log(Level.INFO, "Events received for user with id: {}");
-        return null;
+        Sort sortCriteria = getSortCriteria(sort);
+        if (notificationsDtoList == null) {
+            logger.log(Level.INFO, "Events received for user with id: {}");
+            notificationsDtoList = getNotificationsDtoList();
+            int totalElements = notificationsDtoList.size();
+            totalPages =  (int) Math.ceil((double) totalElements / LIMIT);
+        }
+
+        List<NotificationsDto> notificationsDtoSublist = notificationsDtoList.subList(offset, Math.min(offset + LIMIT, notificationsDtoList.size()));
+        offset += LIMIT;
+
+        PageNotificationsDto pageNotificationsDto = getPageNotificationsDto(size, notificationsDtoSublist, sortCriteria);
+        number ++;
+
+        return pageNotificationsDto;
     }
+
 
     @Override
     public NotificationCountDto getEventsCount() {

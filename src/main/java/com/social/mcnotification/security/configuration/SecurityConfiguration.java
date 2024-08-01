@@ -1,5 +1,6 @@
 package com.social.mcnotification.security.configuration;
 
+import com.social.mcnotification.security.jwt.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -19,6 +20,7 @@ import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -28,6 +30,8 @@ public class SecurityConfiguration {
 
     @Autowired
     private UserDetailsService userDetailsService;
+
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
     
 
 //
@@ -75,7 +79,7 @@ public class SecurityConfiguration {
                 .httpBasic(Customizer.withDefaults())
                 .sessionManagement(httpSecuritySessionManagementConfigurer ->
                         httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authenticationManager(authenticationManager);
+                .authenticationManager(authenticationManager).addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

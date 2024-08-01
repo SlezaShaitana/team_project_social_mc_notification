@@ -55,9 +55,9 @@ public class ApiController {
 
     @GetMapping("/notifications")
     @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')")
-    public ResponseEntity<PageNotificationsDto> getNotifications(@RequestParam("page") int page,
-                                                                 @RequestParam("size") int size,
-                                                                 @RequestParam("sort") List<String> sort,
+    public ResponseEntity<PageNotificationsDto> getNotifications(@RequestParam(name = "page", defaultValue = "0") int page,
+                                                                 @RequestParam(name = "size", defaultValue = "1") int size,
+                                                                 @RequestParam(name = "sort", required = true) List<String> sort,
                                                                  Pageable pageable) {
         return ResponseEntity.ok(notificationService.getNotifications(page, size, sort, pageable));
     }

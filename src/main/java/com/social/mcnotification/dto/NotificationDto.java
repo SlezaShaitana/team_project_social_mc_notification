@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -19,7 +20,7 @@ public class NotificationDto {
     private UUID authorId;
     private String content;
     private NotificationType notificationType;
-    private Timestamp sentTime;
+    private LocalDateTime sentTime; //Timestamp
 
     private UUID receiverId;
     private MicroServiceName serviceName;

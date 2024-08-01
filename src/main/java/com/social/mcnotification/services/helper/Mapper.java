@@ -3,6 +3,7 @@ package com.social.mcnotification.services.helper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.social.mcnotification.dto.NotificationDto;
 import com.social.mcnotification.dto.NotificationSettingDto;
+import com.social.mcnotification.dto.PageNotificationsDto;
 import com.social.mcnotification.model.NotificationEntity;
 import com.social.mcnotification.model.NotificationSettingEntity;
 
