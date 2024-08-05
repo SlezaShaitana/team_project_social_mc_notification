@@ -21,8 +21,11 @@ public class NotificationDto {
     private String content;
     private NotificationType notificationType;
     private LocalDateTime sentTime; //Timestamp
-
     private UUID receiverId;
+
+
+
+
     private MicroServiceName serviceName;
     private UUID eventId;
     private Boolean isReaded;

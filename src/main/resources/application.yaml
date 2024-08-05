@@ -6,6 +6,10 @@ spring:
         defaultZone: http://localhost:8888/eureka/
         register-with-eureka: true
         fetch-registry: true
+    instance:
+      hostname: localhost
+
+
 
   datasource:
     url: jdbc:postgresql://localhost:5432/mcnotification
@@ -25,9 +29,15 @@ spring:
   kafka:
     bootstrap-servers: localhost:9092
 
+
+
+
+
 app:
   kafka:
     kafkaMessageTopic: "notification-topic"
     kafkaMessageGroupId: "kafka-message-group-id"
 
+#jwt:
+#  secret: "ihuhijhgdrftgyhujikopooiuh"
 

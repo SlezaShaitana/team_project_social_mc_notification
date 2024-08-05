@@ -13,6 +13,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,7 +24,7 @@ public class NotificationServiceImpl implements NotificationService {
     private final UUID id = UUID.randomUUID(); //test
     private final int LIMIT = 10;
     private int offset;
-    private List<NotificationsDto> notificationsDtoList;
+    private List<NotificationsDto> notificationsDtoList = new ArrayList<>();
     private int totalPages;
     private int number;
 
