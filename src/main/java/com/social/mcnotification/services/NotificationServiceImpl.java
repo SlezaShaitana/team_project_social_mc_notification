@@ -3,6 +3,7 @@ package com.social.mcnotification.services;
 import com.social.mcnotification.dto.*;
 import com.social.mcnotification.exceptions.InvalidNotificationSettingException;
 import com.social.mcnotification.exceptions.InvalidNotificationTypeException;
+import com.social.mcnotification.exceptions.NotificationNotFoundException;
 import com.social.mcnotification.exceptions.NotificationSettingNotFoundException;
 import com.social.mcnotification.model.NotificationEntity;
 import com.social.mcnotification.model.NotificationSettingEntity;
@@ -95,11 +96,11 @@ public class NotificationServiceImpl implements NotificationService {
     public void markAllEventsAsRead() {
         logger.log(Level.INFO, "all notifications for user: {} are marked as read", id);
         List<NotificationEntity> notificationEntities = notificationRepository.findById(id);
-        if (notificationEntities == null) {}
+        if (notificationEntities.isEmpty()) {
+            throw new NotificationNotFoundException("Notification not found for user: " + id);
+        }
         notificationEntities.forEach(notification -> notification.setIsReaded(true));
         notificationRepository.saveAll(notificationEntities);
-
-
     }
 
     @Override
@@ -118,6 +119,9 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public void createNotification(EventNotificationDto eventNotificationDto) {
         logger.log(Level.INFO, "Event created");
+        if (eventNotificationDto == null) {
+            throw new NotificationNotFoundException("EventNotificationDto is null");
+        }
         NotificationEntity notification = new NotificationEntity();
         notification.setId(id);
         notification.setAuthorId(eventNotificationDto.getAuthorId());
@@ -125,59 +129,58 @@ public class NotificationServiceImpl implements NotificationService {
         notification.setNotificationType(eventNotificationDto.getNotificationType());
         notification.setContent(eventNotificationDto.getContent());
         notificationRepository.save(notification);
-
     }
 
+//
+//    public List<NotificationDto> getNotificationDtoList() {
+//        List<NotificationEntity> notifications = notificationRepository.findById(id);
+//        return notifications.stream()
+//                .map(notificationEntity -> mapper.mapToNotificationDto(notificationEntity))
+//                .toList();
+//    }
+//
+//    public List<NotificationsDto> getNotificationsDtoList() {
+//        List<NotificationDto> notificationDtoList = getNotificationDtoList();
+//        return notificationDtoList.stream()
+//                .map(notification -> new NotificationsDto(notification.getSentTime(), notification)).toList();
+//    }
+//
+//    public PageableObject getPageableObject(Sort sortCriteria, int size) {
+//        PageableObject pageableObject = new PageableObject();
+//        pageableObject.setOffset(offset);
+//        pageableObject.setSort(sortCriteria);
+//        pageableObject.setPaged(true);
+//        pageableObject.setPageSize(size);
+//        pageableObject.setUnpaged(true);
+//        pageableObject.setPageNumber(number);
+//        return pageableObject;
+//    }
+//
+//    public Sort getSortCriteria(List<String> sort) {
+//        return new Sort(
+//                Boolean.parseBoolean(sort.get(0)),
+//                Boolean.parseBoolean(sort.get(0)),
+//                Boolean.parseBoolean(sort.get(0))); // ???
+//    }
 
-    public List<NotificationDto> getNotificationDtoList() {
-        List<NotificationEntity> notifications = notificationRepository.findById(id);
-        return notifications.stream()
-                .map(notificationEntity -> mapper.mapToNotificationDto(notificationEntity))
-                .toList();
-    }
-
-    public List<NotificationsDto> getNotificationsDtoList() {
-        List<NotificationDto> notificationDtoList = getNotificationDtoList();
-        return notificationDtoList.stream()
-                .map(notification -> new NotificationsDto(notification.getSentTime(), notification)).toList();
-    }
-
-    public PageableObject getPageableObject(Sort sortCriteria, int size) {
-        PageableObject pageableObject = new PageableObject();
-        pageableObject.setOffset(offset);
-        pageableObject.setSort(sortCriteria);
-        pageableObject.setPaged(true);
-        pageableObject.setPageSize(size);
-        pageableObject.setUnpaged(true);
-        pageableObject.setPageNumber(number);
-        return pageableObject;
-    }
-
-    public Sort getSortCriteria(List<String> sort) {
-        return new Sort(
-                Boolean.parseBoolean(sort.get(0)),
-                Boolean.parseBoolean(sort.get(0)),
-                Boolean.parseBoolean(sort.get(0))); // ???
-    }
-
-    public PageNotificationsDto getPageNotificationsDto(int size, List<NotificationsDto> notificationsDtoSublist, Sort sortCriteria) {
-        PageNotificationsDto pageNotificationsDto = new PageNotificationsDto();
-        pageNotificationsDto.setTotalPages(totalPages);
-        pageNotificationsDto.setTotalElements(getNotificationsDtoList().size());
-        pageNotificationsDto.setNumber(number);
-        pageNotificationsDto.setSize(size);
-        pageNotificationsDto.setContent(notificationsDtoSublist);
-        pageNotificationsDto.setSort(sortCriteria);
-        pageNotificationsDto.setFirst(number == 0);
-        pageNotificationsDto.setLast(number == totalPages);
-        pageNotificationsDto.setNumberOfElements(
-                notificationsDtoSublist.size() - LIMIT == 0 ? LIMIT : notificationsDtoSublist.size() - LIMIT);
-
-        PageableObject pageableObject = getPageableObject(sortCriteria, notificationsDtoSublist.size());
-        pageNotificationsDto.setPageable(pageableObject);
-        pageNotificationsDto.setEmpty(notificationsDtoList.isEmpty());
-        return pageNotificationsDto;
-    }
+//    public PageNotificationsDto getPageNotificationsDto(int size, List<NotificationsDto> notificationsDtoSublist, Sort sortCriteria) {
+//        PageNotificationsDto pageNotificationsDto = new PageNotificationsDto();
+//        pageNotificationsDto.setTotalPages(totalPages);
+//        pageNotificationsDto.setTotalElements(getNotificationsDtoList().size());
+//        pageNotificationsDto.setNumber(number);
+//        pageNotificationsDto.setSize(size);
+//        pageNotificationsDto.setContent(notificationsDtoSublist);
+//        pageNotificationsDto.setSort(sortCriteria);
+//        pageNotificationsDto.setFirst(number == 0);
+//        pageNotificationsDto.setLast(number == totalPages);
+//        pageNotificationsDto.setNumberOfElements(
+//                notificationsDtoSublist.size() - LIMIT == 0 ? LIMIT : notificationsDtoSublist.size() - LIMIT);
+//
+//        PageableObject pageableObject = getPageableObject(sortCriteria, notificationsDtoSublist.size());
+//        pageNotificationsDto.setPageable(pageableObject);
+//        pageNotificationsDto.setEmpty(notificationsDtoList.isEmpty());
+//        return pageNotificationsDto;
+//    }
 
 
     @Override
@@ -202,13 +205,16 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public NotificationCountDto getEventsCount() {
+        logger.log(Level.INFO, "Count notifications for the user: {}", id);
         List<NotificationEntity> notifications = notificationRepository.findById(id);
+        if (notifications.isEmpty()) {
+            throw new NotificationNotFoundException("Notifications not found for user: " + id);
+        }
         List<NotificationEntity> unreadNotifications = notifications.stream()
-                .filter(notification -> !notification.getIsReaded() || notification.getIsReaded() == null)
+                .filter(notification -> !notification.getIsReaded())
                 .toList();
 
         Count count = new Count(unreadNotifications.size());
-        logger.log(Level.INFO, "Count notifications for the user: {}");
         return new NotificationCountDto(LocalDateTime.now(), count);
     }
 
