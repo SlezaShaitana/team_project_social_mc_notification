@@ -1,10 +1,16 @@
 package com.social.mcnotification.services;
 
 import com.social.mcnotification.dto.*;
+import com.social.mcnotification.exceptions.InvalidNotificationSettingException;
+import com.social.mcnotification.exceptions.InvalidNotificationTypeException;
+import com.social.mcnotification.exceptions.NotificationSettingNotFoundException;
 import com.social.mcnotification.model.NotificationEntity;
 import com.social.mcnotification.model.NotificationSettingEntity;
 import com.social.mcnotification.repository.NotificationRepository;
 import com.social.mcnotification.repository.NotificationSettingRepository;
+import com.social.mcnotification.security.jwt.JwtTokenFilter;
+import com.social.mcnotification.security.jwt.JwtUtils;
+import com.social.mcnotification.security.jwt.User;
 import com.social.mcnotification.services.helper.Mapper;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.Level;
@@ -21,7 +27,10 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class NotificationServiceImpl implements NotificationService {
 
-    private final UUID id = UUID.randomUUID(); //test
+    private final JwtTokenFilter jwtTokenFilter;
+    private final String token = jwtTokenFilter.getUser().getToken();
+    private final User user = jwtTokenFilter.getUser();
+    private final UUID id = user.getId();
     private final int LIMIT = 10;
     private int offset;
     private List<NotificationsDto> notificationsDtoList = new ArrayList<>();
@@ -34,38 +43,59 @@ public class NotificationServiceImpl implements NotificationService {
     private NotificationRepository notificationRepository;
     private NotificationSettingRepository notificationSettingRepository;
     private Mapper mapper;
-    Logger logger = LogManager.getLogger(NotificationServiceImpl.class);
+    private final Logger logger = LogManager.getLogger(NotificationServiceImpl.class);
 
     @Override
     public NotificationSettingDto getNotificationSettings() {
-        logger.log(Level.INFO, "setting up notifications for the user: {}");
+        logger.log(Level.INFO, "setting up notifications for the user: {}", id);
+        NotificationSettingDto notificationSettingDto = mapper.mapToNotificationSettingDto(notificationSettingRepository.findById(id));
+        if (notificationSettingDto == null) {
+            throw new NotificationSettingNotFoundException("Notification settings not found for user: " + id);
+        }
         return mapper.mapToNotificationSettingDto(notificationSettingRepository.findById(id));
     }
 
     @Override
     public void updateNotificationSettings(NotificationUpdateDto notificationUpdateDto) {
-        logger.log(Level.INFO, "Update notification settings for user: {}");
+        logger.log(Level.INFO, "Update notification settings for user: {}", id);
         NotificationSettingEntity notificationSettingEntity = notificationSettingRepository.findById(id);
-
-        switch (notificationUpdateDto.getNotificationType()) {
-            case LIKE -> notificationSettingEntity.setEnableLike(notificationUpdateDto.isEnable());
-            case POST -> notificationSettingEntity.setEnablePost(notificationUpdateDto.isEnable());
-            case POST_COMMENT -> notificationSettingEntity.setEnablePostComment(notificationUpdateDto.isEnable());
-            case COMMENT_COMMENT -> notificationSettingEntity.setEnableCommentComment(notificationUpdateDto.isEnable());
-            case MESSAGE -> notificationSettingEntity.setEnableMessage(notificationUpdateDto.isEnable());
-            case FRIEND_REQUEST -> notificationSettingEntity.setEnableFriendRequest(notificationUpdateDto.isEnable());
-            case FRIEND_BIRTHDAY -> notificationSettingEntity.setEnableFriendBirthday(notificationUpdateDto.isEnable());
-            case SEND_EMAIL_MESSAGE -> notificationSettingEntity.setEnableSendEmailMessage(notificationUpdateDto.isEnable());
+        Boolean setting = notificationUpdateDto.getEnable();
+        if (notificationSettingEntity == null) {
+            throw new NotificationSettingNotFoundException("Notification settings not found for user: " + id);
+        }
+        if (notificationUpdateDto.getNotificationType() == null) {
+            throw new InvalidNotificationTypeException("Notification type is not specified");
+        }
+        if (notificationUpdateDto.getEnable() == null){
+            throw new InvalidNotificationSettingException("Notification setting is not specified");
         }
 
+        switch (notificationUpdateDto.getNotificationType()) {
+            case LIKE -> { notificationSettingEntity.setEnableLike(setting);
+            logger.log(Level.INFO, "Обновлены настройки уведомлений для лайков для пользователя: {} на {}", id, setting);}
+            case POST -> { notificationSettingEntity.setEnablePost(setting);
+                logger.log(Level.INFO, "Обновлены настройки уведомлений для постов для пользователя: {} на {}", id, setting);}
+            case POST_COMMENT -> { notificationSettingEntity.setEnablePostComment(setting);
+                logger.log(Level.INFO, "Обновлены настройки уведомлений для комментариев к постам для пользователя: {} на {}", id, setting);}
+            case COMMENT_COMMENT -> { notificationSettingEntity.setEnableCommentComment(setting);
+                logger.log(Level.INFO, "Обновлены настройки уведомлений для комментариев к комментариям для пользователя: {} на {}", id, setting);}
+            case MESSAGE -> { notificationSettingEntity.setEnableMessage(setting);
+                logger.log(Level.INFO, "Обновлены настройки уведомлений для сообщений для пользователя: {} на {}", id, setting);}
+            case FRIEND_REQUEST -> { notificationSettingEntity.setEnableFriendRequest(setting);
+                logger.log(Level.INFO, "Обновлены настройки уведомлений для запросов в друзья для пользователя: {} на {}", id, setting);}
+            case FRIEND_BIRTHDAY -> { notificationSettingEntity.setEnableFriendBirthday(setting);
+                logger.log(Level.INFO, "Обновлены настройки уведомлений для дней рождения друзей для пользователя: {} на {}", id, setting);}
+            case SEND_EMAIL_MESSAGE -> { notificationSettingEntity.setEnableSendEmailMessage(setting);
+                logger.log(Level.INFO, "Обновлены настройки уведомлений для отправки сообщений по электронной почте для пользователя: {} на {}", id, setting);}
+        }
         notificationSettingRepository.save(notificationSettingEntity);
-
     }
 
     @Override
     public void markAllEventsAsRead() {
-        logger.log(Level.INFO, "all notifications for user: {} are marked as read");
+        logger.log(Level.INFO, "all notifications for user: {} are marked as read", id);
         List<NotificationEntity> notificationEntities = notificationRepository.findById(id);
+        if (notificationEntities == null) {}
         notificationEntities.forEach(notification -> notification.setIsReaded(true));
         notificationRepository.saveAll(notificationEntities);
 
@@ -151,7 +181,7 @@ public class NotificationServiceImpl implements NotificationService {
 
 
     @Override
-    public PageNotificationsDto getNotifications(int page, int size, List<String> sort, Pageable pageable) {
+    public PageNotificationsDto getNotifications(int page, int size, List<String> sort) {
         Sort sortCriteria = getSortCriteria(sort);
         if (notificationsDtoList == null) {
             logger.log(Level.INFO, "Events received for user with id: {}");

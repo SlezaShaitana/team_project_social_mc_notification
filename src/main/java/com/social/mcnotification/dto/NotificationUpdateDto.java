@@ -9,6 +9,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class NotificationUpdateDto {
-    private boolean enable;
+    private Boolean enable;
     private final NotificationType notificationType;
 }

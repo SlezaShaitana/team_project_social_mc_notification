@@ -17,7 +17,7 @@ public interface NotificationService {
 
     void createNotification(EventNotificationDto eventNotificationDto);
 
-    PageNotificationsDto getNotifications(int page, int size, List<String> sort, Pageable pageable);
+    PageNotificationsDto getNotifications(int page, int size, List<String> sort);
 
     NotificationCountDto getEventsCount();
 }

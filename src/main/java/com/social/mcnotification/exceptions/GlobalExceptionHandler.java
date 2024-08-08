@@ -14,4 +14,29 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(new ErrorMessages(e.getMessage()), HttpStatus.CONFLICT);
     }
 
+    @ExceptionHandler({NotificationSettingNotFoundException.class})
+    protected ResponseEntity<ErrorMessages> handleException(NotificationSettingNotFoundException e) {
+        log.error("Application specific error handling", e);
+        return new ResponseEntity<>(new ErrorMessages(e.getMessage()), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({InvalidNotificationTypeException.class})
+    protected ResponseEntity<ErrorMessages> handleException(InvalidNotificationTypeException e) {
+        log.error("Application specific error handling", e);
+        return new ResponseEntity<>(new ErrorMessages(e.getMessage()), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({InvalidNotificationSettingException.class})
+    protected ResponseEntity<ErrorMessages> handleException(InvalidNotificationSettingException e) {
+        log.error("Application specific error handling", e);
+        return new ResponseEntity<>(new ErrorMessages(e.getMessage()), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({NotificationNotFoundException.class})
+    protected ResponseEntity<ErrorMessages> handleException(NotificationNotFoundException e) {
+        log.error("Application specific error handling", e);
+        return new ResponseEntity<>(new ErrorMessages(e.getMessage()), HttpStatus.BAD_REQUEST);
+    }
+
+
 }
