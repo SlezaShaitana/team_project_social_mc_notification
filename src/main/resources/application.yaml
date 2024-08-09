@@ -5,17 +5,6 @@ server:
 
 spring:
 
-  eureka:
-    client:
-      service-url:
-        defaultZone: http://localhost:8888/eureka/
-        register-with-eureka: true
-        fetch-registry: true
-    instance:
-      hostname: localhost
-
-
-
   datasource:
     url: jdbc:postgresql://localhost:5432/mcnotification
     username: root
@@ -35,7 +24,14 @@ spring:
     bootstrap-servers: localhost:9092
 
 
-
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8888/eureka/
+      register-with-eureka: true
+      fetch-registry: true
+  instance:
+    hostname: localhost
 
 
 app:
@@ -46,4 +42,12 @@ app:
 #jwt:
 #  secret: "ihuhijhgdrftgyhujikopooiuh"
 
+
+auth:
+  service:
+    url: http://localhost:8086
+
+friend:
+  service:
+    url: http://localhost:8090
 

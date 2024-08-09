@@ -9,8 +9,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-@FeignClient(name = "mc-auth", url = "${database.url}" + "/api/v1/auth")
+@FeignClient(name = "mc-auth", url = "${auth.service.url}" + "/api/v1/auth")
 public interface AuthClient {
+
+    //http://localhost:8083
     //  public boolean validateToken(String token)
 
     @PostMapping("/validation")
