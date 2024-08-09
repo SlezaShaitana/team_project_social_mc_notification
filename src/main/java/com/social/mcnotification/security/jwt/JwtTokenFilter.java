@@ -32,7 +32,6 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     private final AuthClient authClient;
     @Getter
     private User user;
-    private final NotificationServiceImpl notificationService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
