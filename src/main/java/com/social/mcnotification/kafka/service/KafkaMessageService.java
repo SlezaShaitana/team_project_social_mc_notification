@@ -30,6 +30,8 @@ public class KafkaMessageService {
 
     public void savingToNotificationRepository(NotificationDto notificationDto) {
         MicroServiceName microServiceName = notificationDto.getServiceName();
+
+        //switch (microServiceName)
         //Смотреть откуда пришло
 
         //Пример: пришла из постов
@@ -37,16 +39,18 @@ public class KafkaMessageService {
         //смотришь друзей этого пользователя --> friends
         //сохраняешь в БД столько уведомлений, сколько у пользователя друзей, меняя толкьо receiverId
 
+        if (notificationDto.getReceiverId() == null) {
+            ResponseEntity<List<UUID>> response = friendClient.getFriendsIdListByUserId(notificationDto.getAuthorId());
+            List<UUID> listFriendsId = response.getBody();
 
-        ResponseEntity<List<UUID>> response = friendClient.getFriendsIdListByUserId(notificationDto.getAuthorId());
-        List<UUID> listFriendsId = response.getBody();
-
-        if (listFriendsId != null) {
-            for (UUID uuid : listFriendsId) {
-                notificationDto.setReceiverId(uuid);
-                notificationRepository.save(mapper.mapToNotificationEntity(notificationDto));
+            if (listFriendsId != null) {
+                for (UUID uuid : listFriendsId) {
+                    notificationDto.setReceiverId(uuid);
+                    notificationRepository.save(mapper.mapToNotificationEntity(notificationDto));
+                }
             }
         }
+
     }
 
     public void addToList(NotificationDto notificationDto) {
