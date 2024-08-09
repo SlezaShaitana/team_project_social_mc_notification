@@ -1,6 +1,7 @@
 package com.social.mcnotification.security.jwt;
 
 import com.social.mcnotification.client.AuthClient;
+import com.social.mcnotification.services.NotificationServiceImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,6 +32,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     private final AuthClient authClient;
     @Getter
     private User user;
+    private final NotificationServiceImpl notificationService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
