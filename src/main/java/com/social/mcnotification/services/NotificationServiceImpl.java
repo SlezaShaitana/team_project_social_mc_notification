@@ -25,7 +25,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -37,13 +36,12 @@ public class NotificationServiceImpl implements NotificationService {
     private final String token = jwtTokenFilter.getUser().getToken();
     private final User user = jwtTokenFilter.getUser();
     private final UUID id = user.getId();
-    private List<NotificationsDto> notificationsDtoList = new ArrayList<>();
 
 //    @Value("${app.kafka.MessageTopic}")
 //    private String topicName;
 
-    private NotificationRepository notificationRepository;
-    private NotificationSettingRepository notificationSettingRepository;
+    private final NotificationRepository notificationRepository;
+    private final NotificationSettingRepository notificationSettingRepository;
     private Mapper mapper;
     private final Logger logger = LogManager.getLogger(NotificationServiceImpl.class);
 
@@ -96,7 +94,7 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public void markAllEventsAsRead() {
         logger.log(Level.INFO, "all notifications for user: {} are marked as read", id);
-        List<NotificationEntity> notificationEntities = notificationRepository.findById(id);
+        List<NotificationEntity> notificationEntities = notificationRepository.findByAuthorId(id);
         if (notificationEntities.isEmpty()) {
             throw new NotificationNotFoundException("Notification not found for user: " + id);
         }
@@ -124,8 +122,8 @@ public class NotificationServiceImpl implements NotificationService {
             throw new NotificationNotFoundException("EventNotificationDto is null");
         }
         NotificationEntity notification = new NotificationEntity();
-        notification.setId(id);
-        notification.setAuthorId(eventNotificationDto.getAuthorId());
+        notification.setId(UUID.randomUUID());
+        notification.setAuthorId(id);
         notification.setReceiverId(eventNotificationDto.getReceiverId());
         notification.setNotificationType(eventNotificationDto.getNotificationType());
         notification.setContent(eventNotificationDto.getContent());
@@ -137,11 +135,10 @@ public class NotificationServiceImpl implements NotificationService {
 //        org.springframework.data.domain.Sort sortObj = Sort.by(sort.get(0), sort.get(1), sort.get(2));
         Sort sortObj = Sort.unsorted();
 
-
         Specification<NotificationEntity> spec = Specification.where(null);
         spec = spec.and(NotificationsSpecifications.byAuthorId(id));
 
-        Pageable pageableDto = PageRequest.of(page, size, Sort.by("sentTime"));
+        Pageable pageableDto = PageRequest.of(page, size, Sort.by("sentTime").descending());
 
         return notificationRepository.findAll(spec, pageableDto);
     }
@@ -151,7 +148,7 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public NotificationCountDto getEventsCount() {
         logger.log(Level.INFO, "Count notifications for the user: {}", id);
-        List<NotificationEntity> notifications = notificationRepository.findById(id);
+        List<NotificationEntity> notifications = notificationRepository.findByAuthorId(id);
         if (notifications.isEmpty()) {
             throw new NotificationNotFoundException("Notifications not found for user: " + id);
         }
