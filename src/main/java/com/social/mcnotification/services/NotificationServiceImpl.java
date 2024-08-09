@@ -33,9 +33,9 @@ import java.util.UUID;
 public class NotificationServiceImpl implements NotificationService {
 
     private final JwtTokenFilter jwtTokenFilter;
-    private final String token = jwtTokenFilter.getUser().getToken();
     private final User user = jwtTokenFilter.getUser();
     private final UUID id = user.getId();
+
 
 //    @Value("${app.kafka.MessageTopic}")
 //    private String topicName;

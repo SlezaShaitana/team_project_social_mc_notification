@@ -1,7 +1,7 @@
 package com.social.mcnotification.client.dto;
 
-import com.social.mcnotification.dto.PageableObject;
-import com.social.mcnotification.dto.Sort;
+
+import com.social.mcnotification.dto.SortDto;
 import lombok.Data;
 
 @Data
@@ -11,11 +11,11 @@ public class PageFriendShortDto {
     private int number;
     private int size;
     private FriendShortDto[] content;
-    private Sort sort;
+    private SortDto sort;
     private boolean first;
     private boolean last;
     private int numberOfElements;
-    private PageableObject pageable;
+//    private PageableObject pageable;
     private boolean empty;
 
 }
