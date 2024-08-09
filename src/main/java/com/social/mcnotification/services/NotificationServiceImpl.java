@@ -72,21 +72,21 @@ public class NotificationServiceImpl implements NotificationService {
 
         switch (notificationUpdateDto.getNotificationType()) {
             case LIKE -> { notificationSettingEntity.setEnableLike(setting);
-            logger.log(Level.INFO, "Обновлены настройки уведомлений для лайков для пользователя: {} на {}", id, setting);}
+            logger.log(Level.INFO, "Обновлены настройки уведомлений для лайков. {} на {}", id, setting);}
             case POST -> { notificationSettingEntity.setEnablePost(setting);
-                logger.log(Level.INFO, "Обновлены настройки уведомлений для постов для пользователя: {} на {}", id, setting);}
+                logger.log(Level.INFO, "Обновлены настройки уведомлений для постов. {} на {}", id, setting);}
             case POST_COMMENT -> { notificationSettingEntity.setEnablePostComment(setting);
-                logger.log(Level.INFO, "Обновлены настройки уведомлений для комментариев к постам для пользователя: {} на {}", id, setting);}
+                logger.log(Level.INFO, "Обновлены настройки уведомлений для комментариев к постам. {} на {}", id, setting);}
             case COMMENT_COMMENT -> { notificationSettingEntity.setEnableCommentComment(setting);
-                logger.log(Level.INFO, "Обновлены настройки уведомлений для комментариев к комментариям для пользователя: {} на {}", id, setting);}
+                logger.log(Level.INFO, "Обновлены настройки уведомлений для комментариев к комментариям. {} на {}", id, setting);}
             case MESSAGE -> { notificationSettingEntity.setEnableMessage(setting);
-                logger.log(Level.INFO, "Обновлены настройки уведомлений для сообщений для пользователя: {} на {}", id, setting);}
+                logger.log(Level.INFO, "Обновлены настройки уведомлений для сообщений. {} на {}", id, setting);}
             case FRIEND_REQUEST -> { notificationSettingEntity.setEnableFriendRequest(setting);
-                logger.log(Level.INFO, "Обновлены настройки уведомлений для запросов в друзья для пользователя: {} на {}", id, setting);}
+                logger.log(Level.INFO, "Обновлены настройки уведомлений для запросов в друзья. {} на {}", id, setting);}
             case FRIEND_BIRTHDAY -> { notificationSettingEntity.setEnableFriendBirthday(setting);
-                logger.log(Level.INFO, "Обновлены настройки уведомлений для дней рождения друзей для пользователя: {} на {}", id, setting);}
+                logger.log(Level.INFO, "Обновлены настройки уведомлений для дней рождения друзей. {} на {}", id, setting);}
             case SEND_EMAIL_MESSAGE -> { notificationSettingEntity.setEnableSendEmailMessage(setting);
-                logger.log(Level.INFO, "Обновлены настройки уведомлений для отправки сообщений по электронной почте для пользователя: {} на {}", id, setting);}
+                logger.log(Level.INFO, "Обновлены настройки уведомлений для отправки сообщений по электронной почте. {} на {}", id, setting);}
         }
         notificationSettingRepository.save(notificationSettingEntity);
     }
