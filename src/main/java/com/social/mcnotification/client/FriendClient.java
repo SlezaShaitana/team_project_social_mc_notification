@@ -31,7 +31,7 @@ public interface FriendClient {
     @GetMapping("/friendId/{id}")
     public ResponseEntity<List<UUID>> getFriendsIdListByUserId(@PathVariable("id") UUID uuid);
 
-//    @GetMapping("/blockFriendId")
-//    public ResponseEntity<List<UUID>> getFriendsWhoBlockedUser();
+    @GetMapping("/blockFriendId")
+    public ResponseEntity<List<UUID>> getFriendsWhoBlockedUser();
 
 }
