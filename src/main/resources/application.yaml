@@ -6,7 +6,7 @@ server:
 spring:
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/mcnotification
+    url: jdbc:postgresql://localhost:5435/mcnotification
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
