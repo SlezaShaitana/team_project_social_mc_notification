@@ -1,14 +1,10 @@
-server:
-  port: 8089
-  servlet:
-    context-path: /app
-
 spring:
-
+  application:
+    name: mc-notification
   datasource:
-    url: jdbc:postgresql://localhost:5435/mc_not
-    username: postgres
-    password: postgres
+    url: jdbc:postgresql://localhost:5432/mcnotification
+    username: root
+    password: root
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -23,31 +19,9 @@ spring:
   kafka:
     bootstrap-servers: localhost:9092
 
-
-eureka:
-  client:
-    service-url:
-      defaultZone: http://localhost:8888/eureka/
-      register-with-eureka: true
-      fetch-registry: true
-  instance:
-    hostname: localhost
-
-
 app:
   kafka:
     kafkaMessageTopic: "notification-topic"
     kafkaMessageGroupId: "kafka-message-group-id"
 
-#jwt:
-#  secret: "ihuhijhgdrftgyhujikopooiuh"
-
-
-auth:
-  service:
-    url: http://localhost:8086
-
-friend:
-  service:
-    url: http://localhost:8090
 
