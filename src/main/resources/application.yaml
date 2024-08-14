@@ -2,14 +2,14 @@ spring:
   application:
     name: mc-notification
   datasource:
-    url: jdbc:postgresql://localhost:5432/mcnotification
-    username: root
-    password: root
+    url: jdbc:postgresql://localhost:5435/mc_notification
+    username: postgres
+    password: postgres
     driver-class-name: org.postgresql.Driver
 
   jpa:
     show-sql: true
-    hibernate.ddl-auto: create
+    hibernate.ddl-auto: none
 
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.xml
@@ -24,4 +24,14 @@ app:
     kafkaMessageTopic: "notification-topic"
     kafkaMessageGroupId: "kafka-message-group-id"
 
+server:
+  port: 8089
 
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8888/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    hostname: localhost
