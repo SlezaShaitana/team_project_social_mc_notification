@@ -2,7 +2,7 @@ spring:
   application:
     name: mc-notification
   datasource:
-    url: jdbc:postgresql://localhost:5435/mc_notification
+    url: jdbc:postgresql://localhost:5435/mc_not
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
