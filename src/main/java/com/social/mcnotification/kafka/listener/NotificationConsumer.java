@@ -22,10 +22,19 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class NotificationConsumer {
     private final KafkaMessageService kafkaMessageService;
+//
+//    @KafkaListener(topics = "${app.kafka.kafkaMessageTopic}", groupId = "${app.kafka.kafkaMessageGroupId}", containerFactory = "kafkaMessageConcurrentKafkaListenerContainerFactory")
+//    public void listen(NotificationDto notificationDto) {
+//        log.info("Received notification: {}", notificationDto);
+//        kafkaMessageService.savingToNotificationRepository(notificationDto);
+//
+//    }
 
-    @KafkaListener(topics = "${app.kafka.kafkaMessageTopic}",
-            groupId = "${app.kafka.kafkaMessageGroupId}",
-            containerFactory = "kafkaMessageConcurrentKafkaListenerContainerFactory")
+
+
+
+
+        @KafkaListener(topics = "${app.kafka.kafkaMessageTopic}", groupId = "${app.kafka.kafkaMessageGroupId}", containerFactory = "kafkaMessageConcurrentKafkaListenerContainerFactory")
     public void listen(@Payload NotificationDto notificationDto,
                        @Header(value = KafkaHeaders.RECEIVED_KEY, required = false) UUID key,
                        @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,

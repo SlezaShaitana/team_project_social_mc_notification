@@ -22,7 +22,7 @@ spring:
 app:
   kafka:
     kafkaMessageTopic: "notification-topic"
-    kafkaMessageGroupId: "kafka-message-group-id"
+    kafkaMessageGroupId: "notification-topic-0"
 
 server:
   port: 8089
