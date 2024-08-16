@@ -74,10 +74,6 @@ public class NotificationServiceImpl implements NotificationService {
         }
 
         switch (notificationUpdateDto.getNotificationType()) {
-            case LIKE -> {
-                notificationSettingEntity.setEnableLike(setting);
-                logger.log(Level.INFO, "Обновлены настройки уведомлений для лайков. {} на {}", jwtTokenFilter.getUser().getId(), setting);
-            }
             case POST -> {
                 notificationSettingEntity.setEnablePost(setting);
                 logger.log(Level.INFO, "Обновлены настройки уведомлений для постов. {} на {}", jwtTokenFilter.getUser().getId(), setting);
