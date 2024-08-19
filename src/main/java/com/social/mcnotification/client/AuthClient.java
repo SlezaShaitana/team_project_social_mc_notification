@@ -4,19 +4,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
-@FeignClient(name = "mc-auth", url = "http://localhost:8086" + "/api/v1/auth")
+@FeignClient(value = "JwtValidation", url = "http://79.174.80.200:8086/api/v1/auth")
 public interface AuthClient {
-
-    //http://localhost:8083
-    //  public boolean validateToken(String token)
-
-    @PostMapping("/validation")
-    public Boolean checkTokenValidity(String token);
-    //, UserDetails userDetails, HttpServletRequest request
-
+    @GetMapping("/check-validation")
+    Boolean validateToken(@RequestParam("token") String token);
 }
