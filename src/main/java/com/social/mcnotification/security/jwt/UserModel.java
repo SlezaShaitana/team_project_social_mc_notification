@@ -10,7 +10,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Getter
 @Setter
-public class User {
+public class UserModel {
     private final UUID id;
     private final String token;
     private final String email;

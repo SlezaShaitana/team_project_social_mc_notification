@@ -10,7 +10,7 @@ import com.social.mcnotification.model.NotificationSettingEntity;
 import com.social.mcnotification.repository.NotificationRepository;
 import com.social.mcnotification.repository.NotificationSettingRepository;
 import com.social.mcnotification.security.jwt.JwtTokenFilter;
-import com.social.mcnotification.security.jwt.User;
+import com.social.mcnotification.security.jwt.UserModel;
 import com.social.mcnotification.services.helper.Mapper;
 import com.social.mcnotification.specifications.NotificationsSpecifications;
 import lombok.RequiredArgsConstructor;
@@ -46,7 +46,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public NotificationSettingDto getNotificationSettings() {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        UserModel user = (UserModel) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         logger.log(Level.INFO, "setting up notifications for the user: {}", user.getId());
 
         NotificationSettingDto notificationSettingDto = mapper.mapToNotificationSettingDto(notificationSettingRepository.findById(user.getId()));
@@ -58,7 +58,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public void updateNotificationSettings(NotificationUpdateDto notificationUpdateDto) {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        UserModel user = (UserModel) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         logger.log(Level.INFO, "Update notification settings for user: {}", user.getId());
         NotificationSettingEntity notificationSettingEntity = notificationSettingRepository.findById(user.getId());
         Boolean setting = notificationUpdateDto.getEnable();
@@ -107,7 +107,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public void markAllEventsAsRead() {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        UserModel user = (UserModel) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         logger.log(Level.INFO, "setting up notifications for the user: {}", user.getId());
         List<NotificationEntity> notificationEntities = notificationRepository.findByAuthorId(user.getId());
         if (notificationEntities.isEmpty()) {
@@ -132,7 +132,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public void createNotification(EventNotificationDto eventNotificationDto) {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        UserModel user = (UserModel) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         logger.log(Level.INFO, "Event created");
         if (eventNotificationDto == null) {
             throw new NotificationNotFoundException("EventNotificationDto is null");
@@ -149,7 +149,7 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public Page<NotificationEntity> getNotifications(Integer page, Integer size, List<String> sort) {
 //        org.springframework.data.domain.Sort sortObj = Sort.by(sort.get(0), sort.get(1), sort.get(2));
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        UserModel user = (UserModel) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Sort sortObj = Sort.unsorted();
 
         Specification<NotificationEntity> spec = Specification.where(null);
@@ -163,7 +163,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public NotificationCountDto getEventsCount() {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        UserModel user = (UserModel) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         logger.log(Level.INFO, "setting up notifications for the user: {}", user.getId());
         List<NotificationEntity> notifications = notificationRepository.findByAuthorId(user.getId());
         if (notifications.isEmpty()) {

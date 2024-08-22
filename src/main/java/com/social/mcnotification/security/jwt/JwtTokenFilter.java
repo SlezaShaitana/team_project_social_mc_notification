@@ -59,7 +59,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
-                request.setAttribute("user", new User(id, token, email, roles));
+                request.setAttribute("user", new UserModel(id, token, email, roles));
 
             } else {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
