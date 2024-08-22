@@ -72,7 +72,6 @@ public class ApiController {
     }
 
     @GetMapping("/count")
-    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')")
     public ResponseEntity<NotificationCountDto> getEventsCount() {
         return ResponseEntity.ok(notificationService.getEventsCount());
     }
