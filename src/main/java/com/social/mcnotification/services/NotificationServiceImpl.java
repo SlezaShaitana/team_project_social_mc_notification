@@ -27,154 +27,149 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+    @Service
+    @RequiredArgsConstructor
+    public class NotificationServiceImpl implements NotificationService {
 
-@Service
-@RequiredArgsConstructor
-public class NotificationServiceImpl implements NotificationService {
+        private final NotificationRepository notificationRepository;
+        private final NotificationSettingRepository notificationSettingRepository;
+        private final Mapper mapper;
+        private final Logger logger = LogManager.getLogger(NotificationServiceImpl.class);
 
-    private final JwtTokenFilter jwtTokenFilter;
-//    private final UUID id = jwtTokenFilter.getUser().getId();
-
-
-//    @Value("${app.kafka.MessageTopic}")
-//    private String topicName;
-
-    private final NotificationRepository notificationRepository;
-    private final NotificationSettingRepository notificationSettingRepository;
-    private Mapper mapper;
-    private final Logger logger = LogManager.getLogger(NotificationServiceImpl.class);
-
-    @Override
-    public NotificationSettingDto getNotificationSettings() {
-        UserModel user = (UserModel) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        logger.log(Level.INFO, "setting up notifications for the user: {}", user.getId());
-
-        NotificationSettingDto notificationSettingDto = mapper.mapToNotificationSettingDto(notificationSettingRepository.findById(user.getId()));
-        if (notificationSettingDto == null) {
-            throw new NotificationSettingNotFoundException("Notification settings not found for user: " + user.getId());
-        }
-        return notificationSettingDto;
-    }
-
-    @Override
-    public void updateNotificationSettings(NotificationUpdateDto notificationUpdateDto) {
-        UserModel user = (UserModel) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        logger.log(Level.INFO, "Update notification settings for user: {}", user.getId());
-        NotificationSettingEntity notificationSettingEntity = notificationSettingRepository.findById(user.getId());
-        Boolean setting = notificationUpdateDto.getEnable();
-        if (notificationSettingEntity == null) {
-            throw new NotificationSettingNotFoundException("Notification settings not found for user: " + user.getId());
-        }
-        if (notificationUpdateDto.getNotificationType() == null) {
-            throw new InvalidNotificationTypeException("Notification type is not specified");
-        }
-        if (notificationUpdateDto.getEnable() == null) {
-            throw new InvalidNotificationSettingException("Notification setting is not specified");
-        }
-
-        switch (notificationUpdateDto.getNotificationType()) {
-            case POST -> {
-                notificationSettingEntity.setEnablePost(setting);
-                logger.log(Level.INFO, "Обновлены настройки уведомлений для постов. {} на {}", user.getId(), setting);
-            }
-            case POST_COMMENT -> {
-                notificationSettingEntity.setEnablePostComment(setting);
-                logger.log(Level.INFO, "Обновлены настройки уведомлений для комментариев к постам. {} на {}", user.getId(), setting);
-            }
-            case COMMENT_COMMENT -> {
-                notificationSettingEntity.setEnableCommentComment(setting);
-                logger.log(Level.INFO, "Обновлены настройки уведомлений для комментариев к комментариям. {} на {}", user.getId(), setting);
-            }
-            case MESSAGE -> {
-                notificationSettingEntity.setEnableMessage(setting);
-                logger.log(Level.INFO, "Обновлены настройки уведомлений для сообщений. {} на {}", user.getId(), setting);
-            }
-            case FRIEND_REQUEST -> {
-                notificationSettingEntity.setEnableFriendRequest(setting);
-                logger.log(Level.INFO, "Обновлены настройки уведомлений для запросов в друзья. {} на {}", user.getId(), setting);
-            }
-            case FRIEND_BIRTHDAY -> {
-                notificationSettingEntity.setEnableFriendBirthday(setting);
-                logger.log(Level.INFO, "Обновлены настройки уведомлений для дней рождения друзей. {} на {}", user.getId(), setting);
-            }
-            case SEND_EMAIL_MESSAGE -> {
-                notificationSettingEntity.setEnableSendEmailMessage(setting);
-                logger.log(Level.INFO, "Обновлены настройки уведомлений для отправки сообщений по электронной почте. {} на {}", user.getId(), setting);
+        private UserModel getCurrentUser() {
+            Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            if (principal instanceof UserModel) {
+                return (UserModel) principal;
+            } else {
+                throw new IllegalStateException("Current user is not of type UserModel");
             }
         }
-        notificationSettingRepository.save(notificationSettingEntity);
-    }
 
-    @Override
-    public void markAllEventsAsRead() {
-        UserModel user = (UserModel) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        logger.log(Level.INFO, "setting up notifications for the user: {}", user.getId());
-        List<NotificationEntity> notificationEntities = notificationRepository.findByAuthorId(user.getId());
-        if (notificationEntities.isEmpty()) {
-            throw new NotificationNotFoundException("Notification not found for user: " + user.getId());
+        @Override
+        public NotificationSettingDto getNotificationSettings() {
+            UserModel user = getCurrentUser();
+            logger.log(Level.INFO, "Getting notification settings for user: {}", user.getId());
+
+            NotificationSettingEntity settingEntity = notificationSettingRepository.findById(user.getId());
+            if (settingEntity == null) {
+                throw new NotificationSettingNotFoundException("Notification settings not found for user: " + user.getId());
+            }
+
+            return mapper.mapToNotificationSettingDto(settingEntity);
         }
-        notificationEntities.forEach(notification -> notification.setIsReaded(true));
-        notificationRepository.saveAll(notificationEntities);
-    }
 
-    @Override
-    public Boolean createNotificationSettings(UUID id) {
-        if (id == null) {
-            throw new IllegalArgumentException("ID cannot be null");
+        @Override
+        public void updateNotificationSettings(NotificationUpdateDto notificationUpdateDto) {
+            UserModel user = getCurrentUser();
+            logger.log(Level.INFO, "Updating notification settings for user: {}", user.getId());
+
+            NotificationSettingEntity settingEntity = notificationSettingRepository.findById(user.getId());
+            if (settingEntity == null) {
+                throw new NotificationSettingNotFoundException("Notification settings not found for user: " + user.getId());
+            }
+
+            if (notificationUpdateDto.getNotificationType() == null) {
+                throw new InvalidNotificationTypeException("Notification type is not specified");
+            }
+            if (notificationUpdateDto.getEnable() == null) {
+                throw new InvalidNotificationSettingException("Notification setting is not specified");
+            }
+
+            Boolean setting = notificationUpdateDto.getEnable();
+            switch (notificationUpdateDto.getNotificationType()) {
+                case POST -> settingEntity.setEnablePost(setting);
+                case POST_COMMENT -> settingEntity.setEnablePostComment(setting);
+                case COMMENT_COMMENT -> settingEntity.setEnableCommentComment(setting);
+                case MESSAGE -> settingEntity.setEnableMessage(setting);
+                case FRIEND_REQUEST -> settingEntity.setEnableFriendRequest(setting);
+                case FRIEND_BIRTHDAY -> settingEntity.setEnableFriendBirthday(setting);
+                case SEND_EMAIL_MESSAGE -> settingEntity.setEnableSendEmailMessage(setting);
+                default -> throw new InvalidNotificationTypeException("Unknown notification type: " + notificationUpdateDto.getNotificationType());
+            }
+
+            notificationSettingRepository.save(settingEntity);
+            logger.log(Level.INFO, "Notification settings updated for user: {} to {}", user.getId(), setting);
         }
-        logger.log(Level.INFO, "create a notification setting for the user: {}", id);
 
-        NotificationSettingDto notificationSetting = new NotificationSettingDto();
-        notificationSetting.setId(id);
-        notificationSettingRepository.save(mapper.mapToSettingEntity(notificationSetting));
-        return true;
-    }
+        @Override
+        public void markAllEventsAsRead() {
+            UserModel user = getCurrentUser();
+            logger.log(Level.INFO, "Marking all notifications as read for user: {}", user.getId());
 
-    @Override
-    public void createNotification(EventNotificationDto eventNotificationDto) {
-        UserModel user = (UserModel) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        logger.log(Level.INFO, "Event created");
-        if (eventNotificationDto == null) {
-            throw new NotificationNotFoundException("EventNotificationDto is null");
+            List<NotificationEntity> notifications = notificationRepository.findByAuthorId(user.getId());
+            if (notifications.isEmpty()) {
+                throw new NotificationNotFoundException("No notifications found for user: " + user.getId());
+            }
+
+            notifications.forEach(notification -> notification.setIsReaded(true));
+            notificationRepository.saveAll(notifications);
         }
-        NotificationEntity notification = new NotificationEntity();
-        notification.setId(UUID.randomUUID());
-        notification.setAuthorId(user.getId());
-        notification.setReceiverId(eventNotificationDto.getReceiverId());
-        notification.setNotificationType(eventNotificationDto.getNotificationType());
-        notification.setContent(eventNotificationDto.getContent());
-        notificationRepository.save(notification);
-    }
 
-    @Override
-    public Page<NotificationEntity> getNotifications(Integer page, Integer size, List<String> sort) {
-//        org.springframework.data.domain.Sort sortObj = Sort.by(sort.get(0), sort.get(1), sort.get(2));
-        UserModel user = (UserModel) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Sort sortObj = Sort.unsorted();
+        @Override
+        public Boolean createNotificationSettings(UUID id) {
+            if (id == null) {
+                throw new IllegalArgumentException("ID cannot be null");
+            }
+            logger.log(Level.INFO, "Creating notification settings for user: {}", id);
 
-        Specification<NotificationEntity> spec = Specification.where(null);
-        spec = spec.and(NotificationsSpecifications.byAuthorId(user.getId()));
-
-        Pageable pageableDto = PageRequest.of(page, size, Sort.by("sentTime").descending());
-
-        return notificationRepository.findAll(spec, pageableDto);
-    }
-
-
-    @Override
-    public NotificationCountDto getEventsCount() {
-        UserModel user = (UserModel) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        logger.log(Level.INFO, "setting up notifications for the user: {}", user.getId());
-        List<NotificationEntity> notifications = notificationRepository.findByAuthorId(user.getId());
-        if (notifications.isEmpty()) {
-            throw new NotificationNotFoundException("Notifications not found for user: " + user.getId());
+            NotificationSettingDto notificationSettingDto = new NotificationSettingDto();
+            notificationSettingDto.setId(id);
+            NotificationSettingEntity settingEntity = mapper.mapToSettingEntity(notificationSettingDto);
+            notificationSettingRepository.save(settingEntity);
+            return true;
         }
-        List<NotificationEntity> unreadNotifications = notifications.stream()
-                .filter(notification -> !notification.getIsReaded())
-                .toList();
 
-        Count count = new Count(unreadNotifications.size());
-        return new NotificationCountDto(LocalDateTime.now(), count);
+        @Override
+        public void createNotification(EventNotificationDto eventNotificationDto) {
+            UserModel user = getCurrentUser();
+            logger.log(Level.INFO, "Creating event notification for user: {}", user.getId());
+
+            if (eventNotificationDto == null) {
+                throw new NotificationNotFoundException("EventNotificationDto is null");
+            }
+
+            NotificationEntity notification = new NotificationEntity();
+            notification.setId(UUID.randomUUID());
+            notification.setAuthorId(user.getId());
+            notification.setReceiverId(eventNotificationDto.getReceiverId());
+            notification.setNotificationType(eventNotificationDto.getNotificationType());
+            notification.setContent(eventNotificationDto.getContent());
+            notificationRepository.save(notification);
+        }
+
+        @Override
+        public Page<NotificationEntity> getNotifications(Integer page, Integer size, List<String> sort) {
+            UserModel user = getCurrentUser();
+            logger.log(Level.INFO, "Fetching notifications for user: {}", user.getId());
+
+            Sort sortObj = Sort.by(Sort.Order.desc("sentTime"));
+            if (sort != null && !sort.isEmpty()) {
+                sortObj = Sort.by(sort.stream()
+                        .map(s -> s.startsWith("-") ? Sort.Order.desc(s.substring(1)) : Sort.Order.asc(s))
+                        .toArray(Sort.Order[]::new));
+            }
+
+            Specification<NotificationEntity> spec = Specification.where(NotificationsSpecifications.byAuthorId(user.getId()));
+            Pageable pageable = PageRequest.of(page, size, sortObj);
+
+            return notificationRepository.findAll(spec, pageable);
+        }
+
+        @Override
+        public NotificationCountDto getEventsCount() {
+            UserModel user = getCurrentUser();
+            logger.log(Level.INFO, "Counting events for user: {}", user.getId());
+
+            List<NotificationEntity> notifications = notificationRepository.findByAuthorId(user.getId());
+            if (notifications.isEmpty()) {
+                throw new NotificationNotFoundException("No notifications found for user: " + user.getId());
+            }
+
+            long unreadCount = notifications.stream()
+                    .filter(notification -> !notification.getIsReaded())
+                    .count();
+
+            Count count = new Count((int) unreadCount);
+            return new NotificationCountDto(LocalDateTime.now(), count);
+        }
     }
-
-}
