@@ -24,12 +24,8 @@ import jakarta.servlet.http.*;
 @RequiredArgsConstructor
 @Slf4j
 public class JwtTokenFilter extends OncePerRequestFilter {
-
     private final JwtUtils jwtUtils;
     private final JwtValidation jwtValidation;
-
-    @Getter
-    private User user;
 
     private String getToken(HttpServletRequest request) {
         String headerAuth = request.getHeader("Authorization");
@@ -52,7 +48,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 UUID id = UUID.fromString(jwtUtils.getId(token));
                 String email = jwtUtils.getEmail(token);
                 List<String> roles = jwtUtils.getRoles(token);
-                user = new User(id, token, email, roles);
+
                 Collection<? extends GrantedAuthority> authorities = roles.stream()
                         .map(SimpleGrantedAuthority::new)
                         .collect(Collectors.toList());
@@ -60,7 +56,11 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                         email, null, authorities);
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
                 SecurityContextHolder.getContext().setAuthentication(authentication);
+
+                request.setAttribute("user", new User(id, token, email, roles));
+
             } else {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 return;
