@@ -35,4 +35,5 @@ eureka:
     register-with-eureka: true
     fetch-registry: true
   instance:
+    preferIpAddress: true
     hostname: localhost
