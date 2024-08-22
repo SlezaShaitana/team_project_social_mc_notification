@@ -22,6 +22,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
@@ -36,14 +37,14 @@ import java.util.UUID;
         private final Mapper mapper;
         private final Logger logger = LogManager.getLogger(NotificationServiceImpl.class);
 
-        private UserModel getCurrentUser() {
-            Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            if (principal instanceof UserModel) {
-                return (UserModel) principal;
-            } else {
-                throw new IllegalStateException("Current user is not of type UserModel");
+        public UserModel getCurrentUser() {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication != null && authentication.getPrincipal() instanceof UserModel) {
+                return (UserModel) authentication.getPrincipal();
             }
+            throw new IllegalStateException("Current user is not of type UserModel");
         }
+
 
         @Override
         public NotificationSettingDto getNotificationSettings() {
