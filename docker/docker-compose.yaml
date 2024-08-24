@@ -1,16 +1,16 @@
 version: '2'
 services:
 
-#  postgres:
-#    container_name: pg_container_for_mc
-#    image: postgres
-#    restart: always
-#    environment:
-#      POSTGRES_USER: postgres
-#      POSTGRES_PASSWORD: postgres
-#      POSTGRES_DB: mcnotification
-#    ports:
-#      - "5435:5432"
+  postgres:
+    container_name: pg_container_for_mc
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: mcnotification
+    ports:
+      - "5435:5432"
 
   zookeeper:
     image: confluentinc/cp-zookeeper:latest

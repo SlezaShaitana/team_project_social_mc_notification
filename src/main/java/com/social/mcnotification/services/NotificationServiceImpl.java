@@ -10,6 +10,7 @@ import com.social.mcnotification.model.NotificationSettingEntity;
 import com.social.mcnotification.repository.NotificationRepository;
 import com.social.mcnotification.repository.NotificationSettingRepository;
 import com.social.mcnotification.security.jwt.JwtTokenFilter;
+import com.social.mcnotification.security.jwt.JwtUtils;
 import com.social.mcnotification.security.jwt.User;
 import com.social.mcnotification.services.helper.Mapper;
 import com.social.mcnotification.specifications.NotificationsSpecifications;
@@ -20,12 +21,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -36,12 +41,17 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class NotificationServiceImpl implements NotificationService {
 
+    @Autowired
     private final JwtTokenFilter jwtTokenFilter;
+
+    private final JwtUtils jwtUtils;
 //    private final UUID id = jwtTokenFilter.getUser().getId();
 
 
 //    @Value("${app.kafka.MessageTopic}")
 //    private String topicName;
+
+//    private final String id = SecurityContextHolder.getContext().getAuthentication().getName();
 
     private final NotificationRepository notificationRepository;
     private final NotificationSettingRepository notificationSettingRepository;
@@ -50,6 +60,12 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public NotificationSettingDto getNotificationSettings() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+//        userDetails.
+
+
+
         logger.log(Level.INFO, "setting up notifications for the user: {}", jwtTokenFilter.getUser().getId());
         NotificationSettingDto notificationSettingDto = mapper.mapToNotificationSettingDto(notificationSettingRepository.findById(jwtTokenFilter.getUser().getId()));
         if (notificationSettingDto == null) {
