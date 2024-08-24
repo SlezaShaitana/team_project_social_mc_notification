@@ -22,7 +22,7 @@ public class ApiController {
     private final NotificationService notificationService;
 
     @GetMapping("/settings")
-    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')")
+//    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')")
     public ResponseEntity<NotificationSettingDto> getNotificationSettings() {
         return ResponseEntity.ok(notificationService.getNotificationSettings());
     }
@@ -36,27 +36,24 @@ public class ApiController {
     }
 
     @PutMapping("/readed")
-    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')")
+//    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')")
     public ResponseEntity<String> markAllEventsAsRead() {
         notificationService.markAllEventsAsRead();
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/settings{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')")
     public ResponseEntity<Boolean> createNotificationSettings(@PathVariable("id") UUID id) {
         return ResponseEntity.ok(notificationService.createNotificationSettings(id));
     }
 
     @PostMapping("/add")
-    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')")
     public ResponseEntity<?> createNotification(@RequestBody EventNotificationDto eventNotificationDto) {
         notificationService.createNotification(eventNotificationDto);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("/notifications")
-    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')")
     public ResponseEntity<Page<NotificationDto>> getNotifications(@RequestParam(name = "page", defaultValue = "0") Integer page,
                                                                      @RequestParam(name = "size", defaultValue = "1") Integer size,
                                                                      @RequestParam(name = "sort", required = false) List<String> sort) {
