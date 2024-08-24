@@ -27,7 +27,6 @@ app:
 
 server:
   port: 8089
-
 eureka:
   client:
     service-url:
@@ -36,3 +35,4 @@ eureka:
     fetch-registry: true
   instance:
     preferIpAddress: true
+
