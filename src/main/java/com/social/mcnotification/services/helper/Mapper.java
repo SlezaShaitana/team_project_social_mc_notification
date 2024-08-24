@@ -5,7 +5,9 @@ import com.social.mcnotification.dto.NotificationDto;
 import com.social.mcnotification.dto.NotificationSettingDto;
 import com.social.mcnotification.model.NotificationEntity;
 import com.social.mcnotification.model.NotificationSettingEntity;
+import org.springframework.stereotype.Component;
 
+@Component
 public class Mapper {
     public NotificationEntity mapToNotificationEntity(NotificationDto notificationDto) {
         ObjectMapper objectMapper = new ObjectMapper();
