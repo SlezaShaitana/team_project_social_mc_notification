@@ -39,6 +39,12 @@ import java.util.UUID;
 
         public UserModel getCurrentUser() {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            Object principal = authentication.getPrincipal();
+
+            System.out.println("Principal type: " + principal.getClass().getName());
+
+            System.out.println("Principal details: " + principal);
+
             if (authentication != null && authentication.getPrincipal() instanceof UserModel) {
                 return (UserModel) authentication.getPrincipal();
             }

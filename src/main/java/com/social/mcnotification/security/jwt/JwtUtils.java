@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import java.util.List;
+import java.util.UUID;
 
 @Component
 @Slf4j
@@ -43,4 +44,26 @@ public class JwtUtils {
         byte[] keyBytes = Decoders.BASE64.decode(secret);
         return Keys.hmacShaKeyFor(keyBytes);
     }
+
+
+    public UserModel parseUserFromToken(String token) {
+        String cleanToken = token.startsWith("Bearer ") ? token.substring(7) : token;
+
+        JwtParser jwtParser = Jwts.parser()
+                .setSigningKey(createSecretKey(secret))
+                .build();
+
+        Jws<Claims> claimsJws = jwtParser.parseClaimsJws(cleanToken);
+
+        Claims claims = claimsJws.getBody();
+
+        UUID id = UUID.fromString(claims.get("id", String.class));
+        String email = claims.getSubject();
+        List<String> roles = claims.get("roles", List.class);
+
+        return new UserModel(id, token, email, roles);
+    }
+
+
+
 }
