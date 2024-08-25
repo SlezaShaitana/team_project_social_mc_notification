@@ -147,6 +147,10 @@ import java.util.UUID;
         @Override
         public Page<NotificationEntity> getNotifications(Integer page, Integer size, List<String> sort) {
             UserModel user = getCurrentUser();
+
+            System.out.println("id " + user.getId() + "\n" + "token " + user.getToken()
+                    + "\n" + "email " + user.getEmail() + "\n" + "roles" + user.getRoles());
+
             logger.log(Level.INFO, "Fetching notifications for user: {}", user.getId());
 
             Sort sortObj = Sort.by(Sort.Order.desc("sentTime"));

@@ -28,7 +28,7 @@ public class ApiController {
     }
 
     @PutMapping("/settings")
-    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')")
+//    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')")
     public ResponseEntity<?> updateNotificationSettings(@RequestBody NotificationUpdateDto notificationUpdateDto) {
         notificationService.updateNotificationSettings(notificationUpdateDto);
         return new ResponseEntity<>(HttpStatus.OK);

@@ -45,6 +45,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             log.info("Token: '{}'", token);
 
             if (jwtValidation.validateToken(token)) {
+                log.info("Token validated" + token);
 
                 UserModel user = jwtUtils.parseUserFromToken(token);
 
@@ -67,6 +68,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
             } else {
+                log.info("Token invalid");
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 return;
             }
