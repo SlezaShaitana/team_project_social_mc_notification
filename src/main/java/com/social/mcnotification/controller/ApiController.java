@@ -22,12 +22,14 @@ public class ApiController {
     private final NotificationService notificationService;
 
     @GetMapping("/settings")
+    @PreAuthorize("isAuthenticated()")
 //    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')")
     public ResponseEntity<NotificationSettingDto> getNotificationSettings() {
         return ResponseEntity.ok(notificationService.getNotificationSettings());
     }
 
     @PutMapping("/settings")
+    @PreAuthorize("isAuthenticated()")
 //    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')")
     public ResponseEntity<?> updateNotificationSettings(@RequestBody NotificationUpdateDto notificationUpdateDto) {
         notificationService.updateNotificationSettings(notificationUpdateDto);
@@ -36,6 +38,7 @@ public class ApiController {
     }
 
     @PutMapping("/readed")
+    @PreAuthorize("isAuthenticated()")
 //    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')")
     public ResponseEntity<String> markAllEventsAsRead() {
         notificationService.markAllEventsAsRead();
@@ -43,17 +46,20 @@ public class ApiController {
     }
 
     @PostMapping("/settings{id}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Boolean> createNotificationSettings(@PathVariable("id") UUID id) {
         return ResponseEntity.ok(notificationService.createNotificationSettings(id));
     }
 
     @PostMapping("/add")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> createNotification(@RequestBody EventNotificationDto eventNotificationDto) {
         notificationService.createNotification(eventNotificationDto);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("/notifications")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Page<NotificationDto>> getNotifications(@RequestParam(name = "page", defaultValue = "0") Integer page,
                                                                      @RequestParam(name = "size", defaultValue = "1") Integer size,
                                                                      @RequestParam(name = "sort", required = false) List<String> sort) {
@@ -69,6 +75,7 @@ public class ApiController {
     }
 
     @GetMapping("/count")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<NotificationCountDto> getEventsCount() {
         return ResponseEntity.ok(notificationService.getEventsCount());
     }
