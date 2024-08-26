@@ -150,6 +150,7 @@ import java.util.UUID;
             notification.setReceiverId(eventNotificationDto.getReceiverId());
             notification.setNotificationType(eventNotificationDto.getNotificationType());
             notification.setContent(eventNotificationDto.getContent());
+            notification.setIsReaded(false);
             notificationRepository.save(notification);
         }
 
