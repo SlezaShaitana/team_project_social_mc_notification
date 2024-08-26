@@ -111,7 +111,7 @@ import java.util.UUID;
             UserModel user = getCurrentUser();
             logger.log(Level.INFO, "Marking all notifications as read for user: {}", user.getId());
 
-            List<NotificationEntity> notifications = notificationRepository.findByAuthorId(user.getId());
+            List<NotificationEntity> notifications = notificationRepository.findByReceiverId(user.getId());
             if (notifications.isEmpty()) {
                 throw new NotificationNotFoundException("No notifications found for user: " + user.getId());
             }
@@ -170,7 +170,7 @@ import java.util.UUID;
                         .toArray(Sort.Order[]::new));
             }
 
-            Specification<NotificationEntity> spec = Specification.where(NotificationsSpecifications.byAuthorId(user.getId()));
+            Specification<NotificationEntity> spec = Specification.where(NotificationsSpecifications.byReceiverId(user.getId()));
             Pageable pageable = PageRequest.of(page, size, sortObj);
 
             return notificationRepository.findAll(spec, pageable);
