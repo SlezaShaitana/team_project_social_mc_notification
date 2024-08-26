@@ -71,7 +71,7 @@ public class NotificationConsumer {
 
         kafkaMessageService.savingToNotificationRepository(notificationDto);
 
-    }
+}
 
 
 

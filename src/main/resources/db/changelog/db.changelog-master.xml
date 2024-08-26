@@ -7,7 +7,9 @@
 
     <changeSet id="createNotificationsTable" author="Sasha">
         <createTable tableName="notifications">
-            <column name="id" type="serial">
+<!--            <column name="id" type="serial">-->
+
+            <column name="id" type="uuid">
                 <constraints primaryKey="true"/>
             </column>
             <column name="author_id" type="uuid"/>
@@ -23,7 +25,9 @@
 
     <changeSet id="createNotificationSettingTable" author="Sasha">
         <createTable tableName="notifications_settings">
-            <column name="id" type="serial">
+<!--            <column name="id" type="serial">-->
+
+            <column name="id" type="uuid">
                 <constraints primaryKey="true"/>
             </column>
             <column name="enable_like" type="boolean"/>
@@ -34,7 +38,6 @@
             <column name="enable_friend_request" type="boolean"/>
             <column name="enable_friend_birthday" type="boolean"/>
             <column name="enable_send_email_message" type="boolean"/>
-            <column name="notification_id" type="integer"/>
         </createTable>
     </changeSet>
 

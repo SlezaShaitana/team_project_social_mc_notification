@@ -9,7 +9,6 @@ import com.social.mcnotification.model.NotificationEntity;
 import com.social.mcnotification.model.NotificationSettingEntity;
 import com.social.mcnotification.repository.NotificationRepository;
 import com.social.mcnotification.repository.NotificationSettingRepository;
-import com.social.mcnotification.security.jwt.JwtTokenFilter;
 import com.social.mcnotification.security.jwt.UserModel;
 import com.social.mcnotification.services.helper.Mapper;
 import com.social.mcnotification.specifications.NotificationsSpecifications;
@@ -27,6 +26,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
     @Service
     @RequiredArgsConstructor
@@ -56,13 +56,15 @@ import java.util.UUID;
         public NotificationSettingDto getNotificationSettings() {
             UserModel user = getCurrentUser();
             logger.log(Level.INFO, "Getting notification settings for user: {}", user.getId());
+//
+//            NotificationSettingEntity settingEntity = notificationSettingRepository.findById(user.getId());
 
-            NotificationSettingEntity settingEntity = notificationSettingRepository.findById(user.getId());
-            if (settingEntity == null) {
+            Optional<NotificationSettingEntity> settingEntity = notificationSettingRepository.findById(user.getId());
+            if (settingEntity.isEmpty()) {
                 throw new NotificationSettingNotFoundException("Notification settings not found for user: " + user.getId());
             }
 
-            return mapper.mapToNotificationSettingDto(settingEntity);
+            return mapper.mapToNotificationSettingDto(settingEntity.orElse(null));
         }
 
         @Override
@@ -70,8 +72,12 @@ import java.util.UUID;
             UserModel user = getCurrentUser();
             logger.log(Level.INFO, "Updating notification settings for user: {}", user.getId());
 
-            NotificationSettingEntity settingEntity = notificationSettingRepository.findById(user.getId());
-            if (settingEntity == null) {
+//            NotificationSettingEntity settingEntity = notificationSettingRepository.findById(user.getId());
+
+            Optional<NotificationSettingEntity> settingEntity = notificationSettingRepository.findById(user.getId());
+
+
+            if (settingEntity.isEmpty()) {
                 throw new NotificationSettingNotFoundException("Notification settings not found for user: " + user.getId());
             }
 
@@ -84,17 +90,17 @@ import java.util.UUID;
 
             Boolean setting = notificationUpdateDto.getEnable();
             switch (notificationUpdateDto.getNotificationType()) {
-                case POST -> settingEntity.setEnablePost(setting);
-                case POST_COMMENT -> settingEntity.setEnablePostComment(setting);
-                case COMMENT_COMMENT -> settingEntity.setEnableCommentComment(setting);
-                case MESSAGE -> settingEntity.setEnableMessage(setting);
-                case FRIEND_REQUEST -> settingEntity.setEnableFriendRequest(setting);
-                case FRIEND_BIRTHDAY -> settingEntity.setEnableFriendBirthday(setting);
-                case SEND_EMAIL_MESSAGE -> settingEntity.setEnableSendEmailMessage(setting);
+                case POST -> settingEntity.get().setEnablePost(setting);
+                case POST_COMMENT -> settingEntity.get().setEnablePostComment(setting);
+                case COMMENT_COMMENT -> settingEntity.get().setEnableCommentComment(setting);
+                case MESSAGE -> settingEntity.get().setEnableMessage(setting);
+                case FRIEND_REQUEST -> settingEntity.get().setEnableFriendRequest(setting);
+                case FRIEND_BIRTHDAY -> settingEntity.get().setEnableFriendBirthday(setting);
+                case SEND_EMAIL_MESSAGE -> settingEntity.get().setEnableSendEmailMessage(setting);
                 default -> throw new InvalidNotificationTypeException("Unknown notification type: " + notificationUpdateDto.getNotificationType());
             }
 
-            notificationSettingRepository.save(settingEntity);
+            notificationSettingRepository.save(settingEntity.get());
             logger.log(Level.INFO, "Notification settings updated for user: {} to {}", user.getId(), setting);
         }
 

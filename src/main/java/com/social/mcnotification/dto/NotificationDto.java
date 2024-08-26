@@ -23,13 +23,27 @@ public class NotificationDto {
     private NotificationType notificationType;
     private LocalDateTime sentTime; //Timestamp
     private UUID receiverId;
-
-
-
-
     private MicroServiceName serviceName;
     private UUID eventId;
     private Boolean isReaded;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     public NotificationDto(NotificationEntity notificationEntity) {
         this.id = notificationEntity.getId();
