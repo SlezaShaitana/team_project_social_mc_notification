@@ -30,6 +30,7 @@
             <column name="id" type="uuid">
                 <constraints primaryKey="true"/>
             </column>
+            <column name="user_id" type="uuid"/>
             <column name="enable_like" type="boolean"/>
             <column name="enable_post" type="boolean"/>
             <column name="enable_post_comment" type="boolean"/>

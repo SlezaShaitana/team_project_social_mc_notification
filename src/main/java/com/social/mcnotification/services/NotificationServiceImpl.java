@@ -61,7 +61,7 @@ import java.util.UUID;
 //
 //            NotificationSettingEntity settingEntity = notificationSettingRepository.findById(user.getId());
 
-            Optional<NotificationSettingEntity> settingEntity = notificationSettingRepository.findById(user.getId());
+            Optional<NotificationSettingEntity> settingEntity = notificationSettingRepository.findByUserId(user.getId());
             if (settingEntity.isEmpty()) {
                 throw new NotificationSettingNotFoundException("Notification settings not found for user: " + user.getId());
             }
@@ -76,7 +76,7 @@ import java.util.UUID;
 
 //            NotificationSettingEntity settingEntity = notificationSettingRepository.findById(user.getId());
 
-            Optional<NotificationSettingEntity> settingEntity = notificationSettingRepository.findById(user.getId());
+            Optional<NotificationSettingEntity> settingEntity = notificationSettingRepository.findByUserId(user.getId());
 
 
             if (settingEntity.isEmpty()) {
@@ -128,7 +128,7 @@ import java.util.UUID;
             logger.log(Level.INFO, "Creating notification settings for user: {}", id);
 
             NotificationSettingDto notificationSettingDto = new NotificationSettingDto();
-            notificationSettingDto.setId(id);
+            notificationSettingDto.setUserId(id);
             NotificationSettingEntity settingEntity = mapper.mapToSettingEntity(notificationSettingDto);
             notificationSettingRepository.save(settingEntity);
             return true;

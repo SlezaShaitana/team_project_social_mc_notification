@@ -13,6 +13,7 @@ import java.util.UUID;
 @Setter
 public class NotificationSettingDto {
     private UUID id;
+    private UUID userId;
     private boolean enableLike;
     private boolean enablePost;
     private boolean enablePostComment;
