@@ -61,12 +61,12 @@ import java.util.UUID;
 //
 //            NotificationSettingEntity settingEntity = notificationSettingRepository.findById(user.getId());
 
-            Optional<NotificationSettingEntity> settingEntity = notificationSettingRepository.findByUserId(user.getId());
-            if (settingEntity.isEmpty()) {
+            NotificationSettingEntity settingEntity = notificationSettingRepository.findByUserId(user.getId());
+            if (settingEntity == null) {
                 throw new NotificationSettingNotFoundException("Notification settings not found for user: " + user.getId());
             }
 
-            return mapper.mapToNotificationSettingDto(settingEntity.orElse(null));
+            return mapper.mapToNotificationSettingDto(settingEntity);
         }
 
         @Override
@@ -76,10 +76,10 @@ import java.util.UUID;
 
 //            NotificationSettingEntity settingEntity = notificationSettingRepository.findById(user.getId());
 
-            Optional<NotificationSettingEntity> settingEntity = notificationSettingRepository.findByUserId(user.getId());
+            NotificationSettingEntity settingEntity = notificationSettingRepository.findByUserId(user.getId());
 
 
-            if (settingEntity.isEmpty()) {
+            if (settingEntity == null) {
                 throw new NotificationSettingNotFoundException("Notification settings not found for user: " + user.getId());
             }
 
@@ -92,17 +92,17 @@ import java.util.UUID;
 
             Boolean setting = notificationUpdateDto.getEnable();
             switch (notificationUpdateDto.getNotificationType()) {
-                case POST -> settingEntity.get().setEnablePost(setting);
-                case POST_COMMENT -> settingEntity.get().setEnablePostComment(setting);
-                case COMMENT_COMMENT -> settingEntity.get().setEnableCommentComment(setting);
-                case MESSAGE -> settingEntity.get().setEnableMessage(setting);
-                case FRIEND_REQUEST -> settingEntity.get().setEnableFriendRequest(setting);
-                case FRIEND_BIRTHDAY -> settingEntity.get().setEnableFriendBirthday(setting);
-                case SEND_EMAIL_MESSAGE -> settingEntity.get().setEnableSendEmailMessage(setting);
+                case POST -> settingEntity.setEnablePost(setting);
+                case POST_COMMENT -> settingEntity.setEnablePostComment(setting);
+                case COMMENT_COMMENT -> settingEntity.setEnableCommentComment(setting);
+                case MESSAGE -> settingEntity.setEnableMessage(setting);
+                case FRIEND_REQUEST -> settingEntity.setEnableFriendRequest(setting);
+                case FRIEND_BIRTHDAY -> settingEntity.setEnableFriendBirthday(setting);
+                case SEND_EMAIL_MESSAGE -> settingEntity.setEnableSendEmailMessage(setting);
                 default -> throw new InvalidNotificationTypeException("Unknown notification type: " + notificationUpdateDto.getNotificationType());
             }
 
-            notificationSettingRepository.save(settingEntity.get());
+            notificationSettingRepository.save(settingEntity);
             logger.log(Level.INFO, "Notification settings updated for user: {} to {}", user.getId(), setting);
         }
 
@@ -181,7 +181,7 @@ import java.util.UUID;
             UserModel user = getCurrentUser();
             logger.log(Level.INFO, "Counting events for user: {}", user.getId());
 
-            List<NotificationEntity> notifications = notificationRepository.findByAuthorId(user.getId());
+            List<NotificationEntity> notifications = notificationRepository.findByReceiverId(user.getId());
             if (notifications.isEmpty()) {
                 throw new NotificationNotFoundException("No notifications found for user: " + user.getId());
             }

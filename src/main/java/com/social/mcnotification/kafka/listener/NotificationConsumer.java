@@ -31,7 +31,7 @@ public class NotificationConsumer {
 //    }
 
 
-    
+
         @KafkaListener(topics = "${spring.kafka.kafkaMessageTopic}", groupId = "${spring.kafka.kafkaMessageGroupId}", containerFactory = "kafkaMessageConcurrentKafkaListenerContainerFactory")
     public void listen(@Payload NotificationDto notificationDto,
                        @Header(value = KafkaHeaders.RECEIVED_KEY, required = false) UUID key,
