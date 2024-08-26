@@ -31,9 +31,7 @@ public class NotificationConsumer {
 //    }
 
 
-
-
-
+    
         @KafkaListener(topics = "${spring.kafka.kafkaMessageTopic}", groupId = "${spring.kafka.kafkaMessageGroupId}", containerFactory = "kafkaMessageConcurrentKafkaListenerContainerFactory")
     public void listen(@Payload NotificationDto notificationDto,
                        @Header(value = KafkaHeaders.RECEIVED_KEY, required = false) UUID key,
@@ -46,33 +44,5 @@ public class NotificationConsumer {
         kafkaMessageService.savingToNotificationRepository(notificationDto);
 
     }
-
-    @KafkaListener(topics = "${spring.kafka.kafkaMessageTopicForNotification}", groupId = "${spring.kafka.kafkaMessageGroupId}", containerFactory = "kafkaMessageConcurrentKafkaListenerContainerFactory")
-    public void listenAccount(@Payload NotificationDto notificationDto,
-                       @Header(value = KafkaHeaders.RECEIVED_KEY, required = false) UUID key,
-                       @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
-                       @Header(KafkaHeaders.RECEIVED_PARTITION) Integer partition,
-                       @Header(KafkaHeaders.RECEIVED_TIMESTAMP) Long timestamp) {
-        log.info("Received notification: {}", notificationDto);
-        log.info("Key: {}; Partition: {}; Topic: {}; Timestamp {}", key, partition, topic, timestamp);
-
-        kafkaMessageService.savingToNotificationRepository(notificationDto);
-
-    }
-
-    @KafkaListener(topics = "${spring.kafka.kafkaMessageTopicFriendConfirmation}", groupId = "${spring.kafka.kafkaMessageGroupId}", containerFactory = "kafkaMessageConcurrentKafkaListenerContainerFactory")
-    public void listenFriends(@Payload NotificationDto notificationDto,
-                       @Header(value = KafkaHeaders.RECEIVED_KEY, required = false) UUID key,
-                       @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
-                       @Header(KafkaHeaders.RECEIVED_PARTITION) Integer partition,
-                       @Header(KafkaHeaders.RECEIVED_TIMESTAMP) Long timestamp) {
-        log.info("Received notification: {}", notificationDto);
-        log.info("Key: {}; Partition: {}; Topic: {}; Timestamp {}", key, partition, topic, timestamp);
-
-        kafkaMessageService.savingToNotificationRepository(notificationDto);
-
-}
-
-
 
 }
