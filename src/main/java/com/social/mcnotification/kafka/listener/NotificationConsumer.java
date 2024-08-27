@@ -34,22 +34,16 @@ public class NotificationConsumer {
 
 
         @KafkaListener(topics = "${spring.kafka.kafkaMessageTopic}", groupId = "${spring.kafka.kafkaMessageGroupId}", containerFactory = "kafkaMessageConcurrentKafkaListenerContainerFactory")
-    public void listen(@Payload NotificationDto notificationDto,
-                       @Header(value = KafkaHeaders.RECEIVED_KEY, required = false) UUID key,
-                       @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
+    public void listen(NotificationDto notificationDto) {
         log.info("Received notification: {}", notificationDto);
-        log.info("Key: {}; Topic: {};", key, topic);
 
         kafkaMessageService.savingToNotificationRepository(notificationDto);
 
     }
 
     @KafkaListener(topics = "${spring.kafka.kafkaMessageTopicAuth}", groupId = "${spring.kafka.kafkaMessageGroupIdAuth}", containerFactory = "authKafkaMessageConcurrentKafkaListenerContainerFactory")
-    public void listenAuth(@Payload RegistrationDto registrationDto,
-                       @Header(value = KafkaHeaders.RECEIVED_KEY, required = false) UUID key,
-                       @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
+    public void listenAuth(RegistrationDto registrationDto) {
         log.info("Received registration: {}", registrationDto);
-        log.info("Key: {}; ; Topic: {};", key, topic);
 
         kafkaMessageService.setNotificationMessageForAuthMicroservice(registrationDto);
     }
