@@ -6,6 +6,8 @@ import com.social.mcnotification.services.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.web.PagedModel;
+import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -60,10 +62,14 @@ public class ApiController {
     }
 
 
+
+
+
+
     @GetMapping("/notifications")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Page<NotificationsDto>> getNotifications(@RequestParam(name = "page", defaultValue = "0") Integer page,
-                                                                      @RequestParam(name = "size", defaultValue = "1") Integer size,
+                                                                      @RequestParam(name = "size", defaultValue = "10") Integer size,
                                                                       @RequestParam(name = "sort", required = false) List<String> sort) {
         if (page < 0) {
             page = 0;
@@ -77,7 +83,7 @@ public class ApiController {
 //    @GetMapping("/notifications")
 //    @PreAuthorize("isAuthenticated()")
 //    public ResponseEntity<Page<NotificationDto>> getNotifications(@RequestParam(name = "page", defaultValue = "0") Integer page,
-//                                                                     @RequestParam(name = "size", defaultValue = "1") Integer size,
+//                                                                     @RequestParam(name = "size", defaultValue = "10") Integer size,
 //                                                                     @RequestParam(name = "sort", required = false) List<String> sort) {
 //        if (page < 0) {
 //            page = 0;
