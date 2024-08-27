@@ -13,6 +13,7 @@ import com.social.mcnotification.security.jwt.UserModel;
 import com.social.mcnotification.services.helper.Mapper;
 import com.social.mcnotification.specifications.NotificationsSpecifications;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -32,12 +33,20 @@ import java.util.Optional;
 import java.util.UUID;
     @Service
     @RequiredArgsConstructor
+    @Slf4j
     public class NotificationServiceImpl implements NotificationService {
 
         private final NotificationRepository notificationRepository;
         private final NotificationSettingRepository notificationSettingRepository;
         private final Mapper mapper;
         private final Logger logger = LogManager.getLogger(NotificationServiceImpl.class);
+
+        private void checkPrintUserInfo(UserModel user) {
+            System.out.println("id " + user.getId() +
+                    "\n" + "token " + user.getToken() +
+                    "\n" + "email " + user.getEmail() +
+                    "\n" + "roles" + user.getRoles());
+        }
 
         public UserModel getCurrentUser() {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -58,12 +67,10 @@ import java.util.UUID;
         public NotificationSettingDto getNotificationSettings() {
             UserModel user = getCurrentUser();
             logger.log(Level.INFO, "Getting notification settings for user: {}", user.getId());
-//
-//            NotificationSettingEntity settingEntity = notificationSettingRepository.findById(user.getId());
 
             NotificationSettingEntity settingEntity = notificationSettingRepository.findByUserId(user.getId());
             if (settingEntity == null) {
-                throw new NotificationSettingNotFoundException("Notification settings not found for user: " + user.getId());
+                logger.log(Level.ERROR, "Notification settings not found for user: " + user.getId());
             }
 
             return mapper.mapToNotificationSettingDto(settingEntity);
@@ -76,16 +83,10 @@ import java.util.UUID;
 
             NotificationSettingEntity settingEntity = notificationSettingRepository.findByUserId(user.getId());
 
-
             if (settingEntity == null) {
-                throw new NotificationSettingNotFoundException("Notification settings not found for user: " + user.getId());
-            }
-
-            if (notificationUpdateDto.getNotificationType() == null) {
-                throw new InvalidNotificationTypeException("Notification type is not specified");
-            }
-            if (notificationUpdateDto.getEnable() == null) {
-                throw new InvalidNotificationSettingException("Notification setting is not specified");
+                log.error("Notification settings not found for user: {} ", user.getId());
+                settingEntity = new NotificationSettingEntity();
+                settingEntity.setUserId(getCurrentUser().getId());
             }
 
             Boolean setting = notificationUpdateDto.getEnable();
@@ -157,8 +158,7 @@ import java.util.UUID;
         public Page<NotificationEntity> getNotifications(Integer page, Integer size, List<String> sort) {
             UserModel user = getCurrentUser();
 
-            System.out.println("id " + user.getId() + "\n" + "token " + user.getToken()
-                    + "\n" + "email " + user.getEmail() + "\n" + "roles" + user.getRoles());
+            checkPrintUserInfo(user);
 
             logger.log(Level.INFO, "Fetching notifications for user: {}", user.getId());
 
