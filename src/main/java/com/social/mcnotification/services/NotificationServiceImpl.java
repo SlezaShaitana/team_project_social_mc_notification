@@ -17,10 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -31,7 +28,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-    @Service
+import java.util.stream.Collectors;
+
+@Service
     @RequiredArgsConstructor
     @Slf4j
     public class NotificationServiceImpl implements NotificationService {
@@ -154,26 +153,58 @@ import java.util.UUID;
             }
         }
 
-        @Override
-        public Page<NotificationEntity> getNotifications(Integer page, Integer size, List<String> sort) {
-            UserModel user = getCurrentUser();
 
-            checkPrintUserInfo(user);
+    @Override
+    public Page<NotificationsDto> getNotifications(Integer page, Integer size, List<String> sort) {
+        UserModel user = getCurrentUser();
 
-            logger.log(Level.INFO, "Fetching notifications for user: {}", user.getId());
-
-            Sort sortObj = Sort.by(Sort.Order.desc("sentTime"));
-            if (sort != null && !sort.isEmpty()) {
-                sortObj = Sort.by(sort.stream()
-                        .map(s -> s.startsWith("-") ? Sort.Order.desc(s.substring(1)) : Sort.Order.asc(s))
-                        .toArray(Sort.Order[]::new));
-            }
-
-            Specification<NotificationEntity> spec = Specification.where(NotificationsSpecifications.byReceiverId(user.getId()));
-            Pageable pageable = PageRequest.of(page, size, sortObj);
-
-            return notificationRepository.findAll(spec, pageable);
+        Sort sortObj = Sort.by(Sort.Order.desc("sentTime"));
+        if (sort != null && !sort.isEmpty()) {
+            sortObj = Sort.by(sort.stream()
+                    .map(s -> s.startsWith("-") ? Sort.Order.desc(s.substring(1)) : Sort.Order.asc(s))
+                    .toArray(Sort.Order[]::new));
         }
+
+        Specification<NotificationEntity> spec = Specification.where(NotificationsSpecifications.byReceiverId(user.getId()));
+        Pageable pageable = PageRequest.of(page, size, sortObj);
+
+        Page<NotificationEntity> notificationPage = notificationRepository.findAll(spec, pageable);
+
+        NotificationsDto notificationsDtos = new NotificationsDto();
+        notificationsDtos.setTimeStamp(Timestamp.valueOf(LocalDateTime.now()));
+        notificationsDtos.setData(notificationPage.getContent().stream()
+                .map(mapper::mapToNotificationDto).collect(Collectors.toList()));
+
+
+        return new PageImpl<>(List.of(notificationsDtos), pageable, notificationPage.getTotalElements());
+    }
+
+
+
+
+
+
+
+//        @Override
+//        public Page<NotificationEntity> getNotifications(Integer page, Integer size, List<String> sort) {
+//            UserModel user = getCurrentUser();
+//
+//            checkPrintUserInfo(user);
+//
+//            logger.log(Level.INFO, "Fetching notifications for user: {}", user.getId());
+//
+//            Sort sortObj = Sort.by(Sort.Order.desc("sentTime"));
+//            if (sort != null && !sort.isEmpty()) {
+//                sortObj = Sort.by(sort.stream()
+//                        .map(s -> s.startsWith("-") ? Sort.Order.desc(s.substring(1)) : Sort.Order.asc(s))
+//                        .toArray(Sort.Order[]::new));
+//            }
+//
+//            Specification<NotificationEntity> spec = Specification.where(NotificationsSpecifications.byReceiverId(user.getId()));
+//            Pageable pageable = PageRequest.of(page, size, sortObj);
+//
+//            return notificationRepository.findAll(spec, pageable);
+//        }
 
         @Override
         public NotificationCountDto getEventsCount() {

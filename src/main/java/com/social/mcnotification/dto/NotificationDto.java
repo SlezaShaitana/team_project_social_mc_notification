@@ -21,7 +21,7 @@ public class NotificationDto {
     private UUID authorId;
     private String content;
     private NotificationType notificationType;
-    private LocalDateTime sentTime; //Timestamp
+    private Timestamp sentTime; //Timestamp
     private UUID receiverId;
     private MicroServiceName serviceName;
     private UUID eventId;
@@ -50,7 +50,8 @@ public class NotificationDto {
         this.authorId = notificationEntity.getAuthorId();
         this.content = notificationEntity.getContent();
         this.notificationType = notificationEntity.getNotificationType();
-        this.sentTime = notificationEntity.getSentTime().toLocalDateTime();
+//        this.sentTime = notificationEntity.getSentTime().toLocalDateTime();
+        this.sentTime = notificationEntity.getSentTime();
         this.receiverId = notificationEntity.getReceiverId();
         this.serviceName = notificationEntity.getServiceName();
         this.eventId = notificationEntity.getEventId();

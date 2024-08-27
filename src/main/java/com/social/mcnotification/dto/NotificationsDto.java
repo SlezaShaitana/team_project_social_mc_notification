@@ -7,13 +7,14 @@ import lombok.Setter;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @AllArgsConstructor
 @Getter
 @Setter
 @NoArgsConstructor
 public class NotificationsDto {
-    private LocalDateTime timeStamp; //TimeStamp
-    private NotificationDto data;
+    private Timestamp timeStamp; //TimeStamp
+    private List<NotificationDto> data;
 
 }
