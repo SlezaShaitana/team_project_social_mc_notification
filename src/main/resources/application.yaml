@@ -21,8 +21,11 @@ spring:
     bootstrap-servers: 79.174.80.200:9092
     kafkaMessageTopic: "notification-topic"
     kafkaMessageGroupId: "notification-topic-0"
+    client-id: consumer-notification-topic-0-1
 
     kafkaMessageTopicAuth: "registerTopic"
+    kafkaMessageGroupIdAuth: "register-topic-0"
+    client-id-auth: consumer-register-topic-0-2
 
 
 app:
