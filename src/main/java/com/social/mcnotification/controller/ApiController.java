@@ -80,7 +80,8 @@ public class ApiController {
 //        return ResponseEntity.ok(notificationService.getNotifications(page, size, sort));
 //    }
 
-    @GetMapping("/notifications")
+//    @GetMapping("/notifications")
+    @GetMapping()
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Page<NotificationDto>> getNotifications(@RequestParam(name = "page", defaultValue = "0") Integer page,
                                                                      @RequestParam(name = "size", defaultValue = "10") Integer size,
