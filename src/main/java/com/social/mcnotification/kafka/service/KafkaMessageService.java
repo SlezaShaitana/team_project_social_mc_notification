@@ -5,9 +5,12 @@ import com.social.mcnotification.client.FriendClient;
 import com.social.mcnotification.client.dto.AccountDataDTO;
 import com.social.mcnotification.dto.NotificationDto;
 import com.social.mcnotification.dto.NotificationSettingDto;
+import com.social.mcnotification.dto.RegistrationDto;
 import com.social.mcnotification.enums.MicroServiceName;
 import com.social.mcnotification.enums.NotificationType;
+import com.social.mcnotification.model.NotificationSettingEntity;
 import com.social.mcnotification.repository.NotificationRepository;
+import com.social.mcnotification.repository.NotificationSettingRepository;
 import com.social.mcnotification.services.helper.Mapper;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -28,6 +31,7 @@ public class KafkaMessageService {
 
     private Mapper mapper;
     private final NotificationRepository notificationRepository;
+    private final NotificationSettingRepository notificationSettingRepository;
     private final FriendClient friendClient;
     private final AccountClient accountClient;
     private final List<NotificationDto> messages = new ArrayList<>();
@@ -50,7 +54,6 @@ public class KafkaMessageService {
             case DIALOG -> setNotificationMessageForDialogMicroservice(notificationDto, nameAuthor);
             case FRIENDS -> setNotificationMessageForFriendMicroservice(type, notificationDto, nameAuthor );
             case ACCOUNT -> setNotificationMessageForAccountMicroservice(notificationDto, nameAuthor );
-            case AUTH -> setNotificationMessageForAuthMicroservice(notificationDto, nameAuthor);
         }
 
     }
@@ -128,10 +131,15 @@ public class KafkaMessageService {
         notificationRepository.save(mapper.mapToNotificationEntity(notificationDto));
     }
 
-    public void setNotificationMessageForAuthMicroservice(NotificationDto notificationDto, String nameAuthor) {
+    public void setNotificationMessageForAuthMicroservice(RegistrationDto registrationDto) {
+        NotificationSettingEntity entity = new NotificationSettingEntity();
+        entity.setUserId(registrationDto.getUuid());
+        notificationSettingRepository.save(entity);
         //зарегестророван новый пользователь
         //NEW_USER_REGISTRATION
 //        notificationRepository.save(mapper.mapToNotificationEntity(notificationDto));
+
+
     }
 
 

@@ -22,8 +22,8 @@ spring:
     kafkaMessageTopic: "notification-topic"
     kafkaMessageGroupId: "notification-topic-0"
 
-    kafkaMessageTopicForNotification: "NotificationTopic"
-    kafkaMessageTopicFriendConfirmation: "friendConfirmationTopic"
+    kafkaMessageTopicAuth: "registerTopic"
+
 
 app:
   jwt:

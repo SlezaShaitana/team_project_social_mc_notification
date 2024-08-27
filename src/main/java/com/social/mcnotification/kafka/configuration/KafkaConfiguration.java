@@ -2,6 +2,7 @@ package com.social.mcnotification.kafka.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.social.mcnotification.dto.NotificationDto;
+import com.social.mcnotification.dto.RegistrationDto;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -44,6 +45,8 @@ public class KafkaConfiguration {
 //        return new KafkaTemplate<>(kafkaMessageProducerFactory);
 //    }
 
+    //notification
+
     @Bean
     public ConsumerFactory<String, NotificationDto> kafkaMessageConsumerFactory(ObjectMapper objectMapper) {
         Map<String, Object> config = new HashMap<>();
@@ -65,6 +68,33 @@ public class KafkaConfiguration {
 
         return factory;
     }
+
+
+    //auth
+    @Bean
+    public ConsumerFactory<String, RegistrationDto> authKafkaMessageConsumerFactory(ObjectMapper objectMapper) {
+        Map<String, Object> config = new HashMap<>();
+        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootStrapServers);
+        config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+        config.put(ConsumerConfig.GROUP_ID_CONFIG, kafkaMessageGroupId);
+        config.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
+
+        return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(), new JsonDeserializer<>(objectMapper));
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, RegistrationDto> authKafkaMessageConcurrentKafkaListenerContainerFactory(
+            ConsumerFactory<String, RegistrationDto> kafkaMessageConsumerFactory
+    ) {
+        ConcurrentKafkaListenerContainerFactory<String, RegistrationDto> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(kafkaMessageConsumerFactory);
+
+        return factory;
+    }
+
+
+
 
 
 
@@ -94,9 +124,5 @@ public class KafkaConfiguration {
 //        return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(), new JsonDeserializer<>(objectMapper));
 //    }
 //
-
-
-
-
 
 }
