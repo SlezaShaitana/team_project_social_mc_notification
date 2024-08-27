@@ -155,7 +155,7 @@ import java.util.stream.Collectors;
 
 
     @Override
-    public Page<NotificationsDto> getNotifications(Integer page, Integer size, List<String> sort) {
+    public PageImpl<NotificationsDto> getNotifications(Integer page, Integer size, List<String> sort) {
         UserModel user = getCurrentUser();
 
         Sort sortObj = Sort.by(Sort.Order.desc("sentTime"));
