@@ -59,4 +59,17 @@ public class NotificationConsumer {
     }
 
 
+//    @KafkaListener(topics = "${spring.kafka.kafkaMessageTopicAuth}", groupId = "${spring.kafka.kafkaMessageGroupId}", containerFactory = "kafkaMessageConcurrentKafkaListenerContainerFactory")
+//    public void listenAuth(@Payload RegistrationDto registrationDto,
+//                           @Header(value = KafkaHeaders.RECEIVED_KEY, required = false) UUID key,
+//                           @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
+//                           @Header(KafkaHeaders.RECEIVED_PARTITION) Integer partition,
+//                           @Header(KafkaHeaders.RECEIVED_TIMESTAMP) Long timestamp) {
+//        log.info("Received registration: {}", registrationDto);
+//        log.info("Key: {}; Partition: {}; Topic: {}; Timestamp {}", key, partition, topic, timestamp);
+//
+//        kafkaMessageService.setNotificationMessageForAuthMicroservice(registrationDto);
+//    }
+
+
 }

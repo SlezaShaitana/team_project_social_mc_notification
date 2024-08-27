@@ -74,8 +74,6 @@ import java.util.UUID;
             UserModel user = getCurrentUser();
             logger.log(Level.INFO, "Updating notification settings for user: {}", user.getId());
 
-//            NotificationSettingEntity settingEntity = notificationSettingRepository.findById(user.getId());
-
             NotificationSettingEntity settingEntity = notificationSettingRepository.findByUserId(user.getId());
 
 
@@ -113,11 +111,12 @@ import java.util.UUID;
 
             List<NotificationEntity> notifications = notificationRepository.findByReceiverId(user.getId());
             if (notifications.isEmpty()) {
-                throw new NotificationNotFoundException("No notifications found for user: " + user.getId());
+                logger.log(Level.INFO, "No notifications found for user: {} ", user.getId());
+//                throw new NotificationNotFoundException("No notifications found for user: " + user.getId());
+            } else {
+                notifications.forEach(notification -> notification.setIsReaded(true));
+                notificationRepository.saveAll(notifications);
             }
-
-            notifications.forEach(notification -> notification.setIsReaded(true));
-            notificationRepository.saveAll(notifications);
         }
 
         @Override
@@ -140,9 +139,8 @@ import java.util.UUID;
             logger.log(Level.INFO, "Creating event notification for user: {}", user.getId());
 
             if (eventNotificationDto == null) {
-                throw new NotificationNotFoundException("EventNotificationDto is null");
-            }
-
+                logger.log(Level.INFO, "EventNotificationDto is null");
+            } else {
             NotificationEntity notification = new NotificationEntity();
             notification.setId(UUID.randomUUID());
             notification.setSentTime(Timestamp.valueOf(LocalDateTime.now()));
@@ -152,6 +150,7 @@ import java.util.UUID;
             notification.setContent(eventNotificationDto.getContent());
             notification.setIsReaded(false);
             notificationRepository.save(notification);
+            }
         }
 
         @Override
@@ -183,7 +182,7 @@ import java.util.UUID;
 
             List<NotificationEntity> notifications = notificationRepository.findByReceiverId(user.getId());
             if (notifications.isEmpty()) {
-                throw new NotificationNotFoundException("No notifications found for user: " + user.getId());
+                logger.log(Level.INFO, "No notifications found for user: {} ", user.getId());
             }
 
             long unreadCount = notifications.stream()
