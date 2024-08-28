@@ -20,7 +20,7 @@ public interface NotificationService {
 
     void createNotification(EventNotificationDto eventNotificationDto);
 
-    Page<NotificationEntity> getNotifications(Integer page, Integer size, String sort);
+    Page<NotificationEntity> getNotifications(Integer page, Integer size, List<String> sort);
 //
 //    Page<NotificationsDto> getNotifications(Integer page, Integer size, List<String> sort);
 

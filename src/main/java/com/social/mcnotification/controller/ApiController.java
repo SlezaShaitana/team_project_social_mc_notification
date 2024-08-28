@@ -85,7 +85,7 @@ public class ApiController {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Page<NotificationDto>> getNotifications(@RequestParam(name = "page", defaultValue = "0") Integer page,
                                                                      @RequestParam(name = "size", defaultValue = "10") Integer size,
-                                                                     @RequestParam(name = "sort", required = false) String sort) {
+                                                                     @RequestParam(name = "sort", required = false) List<String> sort) {
         if (page < 0) {
             page = 0;
         }
