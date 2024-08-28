@@ -23,6 +23,14 @@
                 <ThresholdFilter level="fatal" onMatch="DENY" onMismatch="NEUTRAL" />
             </Filters>
         </File>
+
+        <File name="DebugsFile" fileName="logs/debugs.log">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+            <Filters>
+                <ThresholdFilter level="fatal" onMatch="DENY" onMismatch="NEUTRAL" />
+            </Filters>
+        </File>
+
     </appenders>
 
 
@@ -31,6 +39,7 @@
             <appender-ref ref="Console"/>
             <appender-ref ref="SearchFile" level="info"/>
             <appender-ref ref="ErrorsFile" level="error"/>
+            <appender-ref ref="DebugsFile" level="debug"/>
 
         </root>
     </loggers>
