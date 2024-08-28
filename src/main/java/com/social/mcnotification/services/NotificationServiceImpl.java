@@ -41,19 +41,16 @@ import java.util.stream.Collectors;
         private final Logger logger = LogManager.getLogger(NotificationServiceImpl.class);
 
         private void checkPrintUserInfo(UserModel user) {
-            System.out.println("id " + user.getId() +
-                    "\n" + "token " + user.getToken() +
-                    "\n" + "email " + user.getEmail() +
-                    "\n" + "roles" + user.getRoles());
+            logger.info("id: {}, token: {}, email: {}, roles: {}",
+                    user.getId(),
+                    user.getToken(),
+                    user.getEmail(),
+                    user.getRoles());
         }
 
         public UserModel getCurrentUser() {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             Object principal = authentication.getPrincipal();
-
-            System.out.println("Principal type: " + principal.getClass().getName());
-
-            System.out.println("Principal details: " + principal);
 
             if (authentication != null && authentication.getPrincipal() instanceof UserModel) {
                 return (UserModel) authentication.getPrincipal();
@@ -112,7 +109,6 @@ import java.util.stream.Collectors;
             List<NotificationEntity> notifications = notificationRepository.findByReceiverId(user.getId());
             if (notifications.isEmpty()) {
                 logger.log(Level.INFO, "No notifications found for user: {} ", user.getId());
-//                throw new NotificationNotFoundException("No notifications found for user: " + user.getId());
             } else {
                 notifications.forEach(notification -> notification.setIsReaded(true));
                 notificationRepository.saveAll(notifications);
@@ -233,6 +229,8 @@ import java.util.stream.Collectors;
 
         @Override
         public Page<NotificationEntity> getNotifications(Integer page, Integer size, String sort) {
+
+            logger.log(Level.INFO, "Getting notifications for page: {}, size: {}, sort: {}", page, size, sort);
             UserModel user = getCurrentUser();
 
             checkPrintUserInfo(user);

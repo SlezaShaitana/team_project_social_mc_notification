@@ -19,6 +19,7 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://79.174.80.200")
 @RequestMapping("/api/v1/notifications")
 public class ApiController {
 
