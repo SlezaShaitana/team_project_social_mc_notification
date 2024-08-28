@@ -229,20 +229,23 @@ import java.util.stream.Collectors;
 
         @Override
         public Page<NotificationEntity> getNotifications(Integer page, Integer size, String sort) {
-
             logger.log(Level.INFO, "Getting notifications for page: {}, size: {}, sort: {}", page, size, sort);
             UserModel user = getCurrentUser();
-
-            checkPrintUserInfo(user);
-
             logger.log(Level.INFO, "Fetching notifications for user: {}", user.getId());
 
-            Sort sortObj = Sort.by(Sort.Order.desc("sentTime"));
+            //old code
+//            Sort sortObj = Sort.by(Sort.Order.desc("sentTime"));
 //            if (sort != null && !sort.isEmpty()) {
 //                sortObj = Sort.by(sort.stream()
 //                        .map(s -> s.startsWith("-") ? Sort.Order.desc(s.substring(1)) : Sort.Order.asc(s))
 //                        .toArray(Sort.Order[]::new));
 //            }
+
+            String[] sortParts = sort.split(",");
+            String field = sortParts[0];
+            String direction = sortParts[1];
+
+            Sort sortObj = Sort.by("desc".equalsIgnoreCase(direction) ? Sort.Order.desc(field) : Sort.Order.asc(field));
 
             Specification<NotificationEntity> spec = Specification.where(NotificationsSpecifications.byReceiverId(user.getId()));
             Pageable pageable = PageRequest.of(page, size, sortObj);
