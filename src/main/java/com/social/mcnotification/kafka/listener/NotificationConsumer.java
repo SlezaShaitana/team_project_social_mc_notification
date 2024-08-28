@@ -32,48 +32,48 @@ public class NotificationConsumer {
 //    }
 
 
-    @KafkaListener(topics = "registerTopic", groupId = "${spring.kafka.kafkaMessageGroupId}", containerFactory = "authkKafkaMessageConcurrentKafkaListenerContainerFactory")
-    public void listen(RegistrationDto accountDtoRequest) {
-        log.info("Received data: " + accountDtoRequest);
-        try {
-            kafkaMessageService.setNotificationMessageForAuthMicroservice(accountDtoRequest);
-
-        } catch (Exception e) {
-            log.error("Failed to create account from Kafka message", e);
-        }
-    }
-
-    @KafkaListener(topics = "${spring.kafka.kafkaMessageTopic}", groupId = "${spring.kafka.kafkaMessageGroupId}", containerFactory = "authkKafkaMessageConcurrentKafkaListenerContainerFactory")
-    public void listen(NotificationDto notificationDto) {
-        log.info("Received data: " + notificationDto);
-        try {
-            kafkaMessageService.savingToNotificationRepository(notificationDto);
-
-        } catch (Exception e) {
-            log.error("Failed to notification from Kafka message", e);
-        }
-    }
-
-
-
-
-
-
-
-//    @KafkaListener(topics = "${spring.kafka.kafkaMessageTopic}", groupId = "${spring.kafka.kafkaMessageGroupId}", containerFactory = "kafkaMessageConcurrentKafkaListenerContainerFactory")
+//    @KafkaListener(topics = "registerTopic", groupId = "${spring.kafka.kafkaMessageGroupId}", containerFactory = "authkKafkaMessageConcurrentKafkaListenerContainerFactory")
+//    public void listen(RegistrationDto accountDtoRequest) {
+//        log.info("Received data: " + accountDtoRequest);
+//        try {
+//            kafkaMessageService.setNotificationMessageForAuthMicroservice(accountDtoRequest);
+//
+//        } catch (Exception e) {
+//            log.error("Failed to create account from Kafka message", e);
+//        }
+//    }
+//
+//    @KafkaListener(topics = "${spring.kafka.kafkaMessageTopic}", groupId = "${spring.kafka.kafkaMessageGroupId}", containerFactory = "authkKafkaMessageConcurrentKafkaListenerContainerFactory")
 //    public void listen(NotificationDto notificationDto) {
-//        log.info("Received notification: {}", notificationDto);
+//        log.info("Received data: " + notificationDto);
+//        try {
+//            kafkaMessageService.savingToNotificationRepository(notificationDto);
 //
-//        kafkaMessageService.savingToNotificationRepository(notificationDto);
-//
+//        } catch (Exception e) {
+//            log.error("Failed to notification from Kafka message", e);
+//        }
 //    }
 
-//    @KafkaListener(topics = "${spring.kafka.kafkaMessageTopicAuth}", groupId = "${spring.kafka.kafkaMessageGroupIdAuth}", containerFactory = "authKafkaMessageConcurrentKafkaListenerContainerFactory")
-//    public void listenAuth(RegistrationDto registrationDto) {
-//        log.info("Received registration: {}", registrationDto);
-//
-//        kafkaMessageService.setNotificationMessageForAuthMicroservice(registrationDto);
-//    }
+
+
+
+
+
+
+    @KafkaListener(topics = "${spring.kafka.kafkaMessageTopic}", groupId = "${spring.kafka.kafkaMessageGroupId}", containerFactory = "kafkaMessageConcurrentKafkaListenerContainerFactory")
+    public void listen(NotificationDto notificationDto) {
+        log.info("Received notification: {}", notificationDto);
+
+        kafkaMessageService.savingToNotificationRepository(notificationDto);
+
+    }
+
+    @KafkaListener(topics = "${spring.kafka.kafkaMessageTopicAuth}", groupId = "${spring.kafka.kafkaMessageGroupIdAuth}", containerFactory = "authKafkaMessageConcurrentKafkaListenerContainerFactory")
+    public void listenAuth(RegistrationDto registrationDto) {
+        log.info("Received registration: {}", registrationDto);
+
+        kafkaMessageService.setNotificationMessageForAuthMicroservice(registrationDto);
+    }
 
 
 
