@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -220,61 +221,85 @@ import java.util.stream.Collectors;
 //        return new PageImpl<>(List.of(notificationsDtos), pageable, notificationPage.getTotalElements());
 //    }
 
-
-
 //    @Override
-//    public Page<NotificationsDto> getNotifications(Integer page, Integer size, String sort) {
-//        UserModel user = getCurrentUser();
-//        logger.log(Level.INFO, "get Notification");
-//        logger.info("get Notification");
+//    public PageNotificationsDto getNotifications() throws MyBadCredentialsException {
+//        log.info("Сработал сервис Получение событий");
+//        Pageable page = new Pageable();
+//        page.setSort(new String[]{"desc"});
+//        page.setPage(0);
+//        page.setSize(15);
 //
+//        UUID uuid = currentUserConfig.getUuidCurrentUser();
 //
+//        org.springframework.data.domain.Pageable nextPage = PageRequest.of(page.getPage(), page.getSize());
+//        Page<Notification> pageNotifications = notificationRepository.getNotificationsByReceiverIdAndIsReaded(uuid , false, nextPage);
+//        log.info("Прочитано {} событий", pageNotifications.get().count());
 //
-//        String[] sortParts = sort.split(",");
-//        String field = sortParts[0];
-//        String direction = sortParts[1];
+//        NotificationsDto[] content = getNotificationsDtos(pageNotifications);
 //
-//        Sort sortObj = Sort.by("desc".equalsIgnoreCase(direction) ? Sort.Order.desc(field) : Sort.Order.asc(field));
+//        PageableObject pageableObject = getPageableObject(page);
 //
+//        return getPageNotificationsDto(page, pageNotifications, content, pageableObject);
+//    }
+
+
+//    private static NotificationsDto[] getNotificationsDtos(Page<Notification> pageNotifications) {
+//        List<NotificationsDto> list = new ArrayList<>();
 //
-//        Specification<NotificationEntity> spec = Specification.where(NotificationsSpecifications.byReceiverId(user.getId()));
-//        Pageable pageable = PageRequest.of(page, size, sortObj);
+//        pageNotifications.forEach(x -> {
+//            NotificationDto notificationDto = NotificationDto.builder()
+//                    .id(x.getId())
+//                    .authorId(x.getAuthorId())
+//                    .content(x.getContent())
+//                    .notificationType(x.getNotificationType())
+//                    .sentTime(x.getSentTime())
+//                    .build();
 //
-//        Page<NotificationEntity> notificationPage = notificationRepository.findAll(spec, pageable);
+//            NotificationsDto notificationsDto = new NotificationsDto();
+//            notificationsDto.setTimeStamp(x.getSentTime());
+//            notificationsDto.setData(notificationDto);
 //
-//        List<NotificationsDto> notificationsDtos = notificationPage.getContent().stream()
-//                .map(this::convertToNotificationsDto)
-//                .collect(Collectors.toList());
+//            list.add(notificationsDto);
+//        });
 //
-//
-//        return new PageImpl<>(notificationsDtos, pageable, notificationPage.getTotalElements());
+//        NotificationsDto[] content = list.toArray(new NotificationsDto[0]);
+//        return content;
 //    }
 //
-//    private NotificationsDto convertToNotificationsDto(NotificationEntity entity) {
-//        NotificationDto notificationDto = new NotificationDto();
-//        notificationDto.setId(entity.getId());
-//        notificationDto.setAuthorId(entity.getAuthorId());
-//        notificationDto.setContent(entity.getContent());
-//        notificationDto.setNotificationType(entity.getNotificationType());
-//        notificationDto.setSentTime(entity.getSentTime());
-//        notificationDto.setReceiverId(entity.getReceiverId());
-//        notificationDto.setServiceName(entity.getServiceName());
-//        notificationDto.setEventId(entity.getEventId());
-//        notificationDto.setIsReaded(entity.getIsReaded());
-//
-//        NotificationsDto notificationsDto = new NotificationsDto();
-//        notificationsDto.setTimeStamp(entity.getSentTime());
-//        notificationsDto.setData(notificationDto);
-//
-//        return notificationsDto;
+//    private static PageableObject getPageableObject(Pageable page) {
+//        return PageableObject.builder()
+//                .offset(page.getPage())
+//                .sort(null)  // Уточнить
+//                .paged(false)
+//                .pageSize(10)  // Уточнить
+//                .unpaged(true)
+//                .pageNumber(1)  // Уточнить
+//                .build();
 //    }
+//
+//    private static PageNotificationsDto getPageNotificationsDto(Pageable page, Page<Notification> pageNotifications, NotificationsDto[] content, PageableObject pageableObject) {
+//        return PageNotificationsDto.builder()
+//                .totalPages(1000)          // Уточнить
+//                .totalElements((int) pageNotifications.get().count())  // Уточнить
+//                .number(page.getPage())  // Уточнить
+//                .size(page.getSize())  // Уточнить
+//                .content(content)
+//                .sort(null)  // Уточнить
+//                .first(true)  // Уточнить
+//                .last(false)  // Уточнить
+//                .numberOfElements(10000)  // Уточнить
+//                .pageable(pageableObject)
+//                .empty(false)  // Уточнить
+//                .build();
+//    }
+
 
 
     @Override
-    public Page<NotificationEntity> getNotifications(Integer page, Integer size, String sort) {
-        logger.log(Level.INFO, "Getting notifications for page: {}, size: {}, sort: {}", page, size, sort);
+    public Page<NotificationsDto> getNotifications(Integer page, Integer size, String sort) {
         UserModel user = getCurrentUser();
-        logger.log(Level.INFO, "Fetching notifications for user: {}", user.getId());
+        logger.log(Level.INFO, "get Notification");
+        logger.info("get Notification");
 
         String[] sortParts = sort.split(",");
         String field = sortParts[0];
@@ -282,11 +307,49 @@ import java.util.stream.Collectors;
 
         Sort sortObj = Sort.by("desc".equalsIgnoreCase(direction) ? Sort.Order.desc(field) : Sort.Order.asc(field));
 
+
         Specification<NotificationEntity> spec = Specification.where(NotificationsSpecifications.byReceiverId(user.getId()));
+        spec = spec.and(NotificationsSpecifications.isReaded(false));
+
         Pageable pageable = PageRequest.of(page, size, sortObj);
 
-        return notificationRepository.findAll(spec, pageable);
+        Page<NotificationEntity> notificationPage = notificationRepository.findAll(spec, pageable);
+
+
+        List<NotificationsDto> content = notificationPage.getContent().stream()
+                .map(notification -> new NotificationsDto(
+                        notification.getSentTime(),
+                        new EventNotificationDto(
+                                notification.getAuthorId(),
+                                notification.getReceiverId(),
+                                notification.getNotificationType(),
+                                notification.getContent()
+                        )
+                ))
+                .collect(Collectors.toList());
+
+
+        return new PageImpl<>(content, pageable, notificationPage.getTotalElements());
     }
+
+
+//    @Override
+//    public Page<NotificationEntity> getNotifications(Integer page, Integer size, String sort) {
+//        logger.log(Level.INFO, "Getting notifications for page: {}, size: {}, sort: {}", page, size, sort);
+//        UserModel user = getCurrentUser();
+//        logger.log(Level.INFO, "Fetching notifications for user: {}", user.getId());
+//
+//        String[] sortParts = sort.split(",");
+//        String field = sortParts[0];
+//        String direction = sortParts[1];
+//
+//        Sort sortObj = Sort.by("desc".equalsIgnoreCase(direction) ? Sort.Order.desc(field) : Sort.Order.asc(field));
+//
+//        Specification<NotificationEntity> spec = Specification.where(NotificationsSpecifications.byReceiverId(user.getId()));
+//        Pageable pageable = PageRequest.of(page, size, sortObj);
+//
+//        return notificationRepository.findAll(spec, pageable);
+//    }
 
 
 

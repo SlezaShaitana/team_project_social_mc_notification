@@ -15,6 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 public class NotificationsDto {
     private Timestamp timeStamp; //TimeStamp
-    private NotificationDto data; // // private List<NotificationDto> data;
+    //    private NotificationDto data; // // private List<NotificationDto> data;
+    private EventNotificationDto data;
 
 }
