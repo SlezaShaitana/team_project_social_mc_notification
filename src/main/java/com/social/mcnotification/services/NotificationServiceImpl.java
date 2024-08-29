@@ -222,13 +222,59 @@ import java.util.stream.Collectors;
 
 
 
+//    @Override
+//    public Page<NotificationsDto> getNotifications(Integer page, Integer size, String sort) {
+//        UserModel user = getCurrentUser();
+//        logger.log(Level.INFO, "get Notification");
+//        logger.info("get Notification");
+//
+//
+//
+//        String[] sortParts = sort.split(",");
+//        String field = sortParts[0];
+//        String direction = sortParts[1];
+//
+//        Sort sortObj = Sort.by("desc".equalsIgnoreCase(direction) ? Sort.Order.desc(field) : Sort.Order.asc(field));
+//
+//
+//        Specification<NotificationEntity> spec = Specification.where(NotificationsSpecifications.byReceiverId(user.getId()));
+//        Pageable pageable = PageRequest.of(page, size, sortObj);
+//
+//        Page<NotificationEntity> notificationPage = notificationRepository.findAll(spec, pageable);
+//
+//        List<NotificationsDto> notificationsDtos = notificationPage.getContent().stream()
+//                .map(this::convertToNotificationsDto)
+//                .collect(Collectors.toList());
+//
+//
+//        return new PageImpl<>(notificationsDtos, pageable, notificationPage.getTotalElements());
+//    }
+//
+//    private NotificationsDto convertToNotificationsDto(NotificationEntity entity) {
+//        NotificationDto notificationDto = new NotificationDto();
+//        notificationDto.setId(entity.getId());
+//        notificationDto.setAuthorId(entity.getAuthorId());
+//        notificationDto.setContent(entity.getContent());
+//        notificationDto.setNotificationType(entity.getNotificationType());
+//        notificationDto.setSentTime(entity.getSentTime());
+//        notificationDto.setReceiverId(entity.getReceiverId());
+//        notificationDto.setServiceName(entity.getServiceName());
+//        notificationDto.setEventId(entity.getEventId());
+//        notificationDto.setIsReaded(entity.getIsReaded());
+//
+//        NotificationsDto notificationsDto = new NotificationsDto();
+//        notificationsDto.setTimeStamp(entity.getSentTime());
+//        notificationsDto.setData(notificationDto);
+//
+//        return notificationsDto;
+//    }
+
+
     @Override
-    public Page<NotificationsDto> getNotifications(Integer page, Integer size, String sort) {
+    public Page<NotificationEntity> getNotifications(Integer page, Integer size, String sort) {
+        logger.log(Level.INFO, "Getting notifications for page: {}, size: {}, sort: {}", page, size, sort);
         UserModel user = getCurrentUser();
-        logger.log(Level.INFO, "get Notification");
-        logger.info("get Notification");
-
-
+        logger.log(Level.INFO, "Fetching notifications for user: {}", user.getId());
 
         String[] sortParts = sort.split(",");
         String field = sortParts[0];
@@ -236,38 +282,18 @@ import java.util.stream.Collectors;
 
         Sort sortObj = Sort.by("desc".equalsIgnoreCase(direction) ? Sort.Order.desc(field) : Sort.Order.asc(field));
 
-
         Specification<NotificationEntity> spec = Specification.where(NotificationsSpecifications.byReceiverId(user.getId()));
         Pageable pageable = PageRequest.of(page, size, sortObj);
 
-        Page<NotificationEntity> notificationPage = notificationRepository.findAll(spec, pageable);
-
-        List<NotificationsDto> notificationsDtos = notificationPage.getContent().stream()
-                .map(this::convertToNotificationsDto)
-                .collect(Collectors.toList());
-
-
-        return new PageImpl<>(notificationsDtos, pageable, notificationPage.getTotalElements());
+        return notificationRepository.findAll(spec, pageable);
     }
 
-    private NotificationsDto convertToNotificationsDto(NotificationEntity entity) {
-        NotificationDto notificationDto = new NotificationDto();
-        notificationDto.setId(entity.getId());
-        notificationDto.setAuthorId(entity.getAuthorId());
-        notificationDto.setContent(entity.getContent());
-        notificationDto.setNotificationType(entity.getNotificationType());
-        notificationDto.setSentTime(entity.getSentTime());
-        notificationDto.setReceiverId(entity.getReceiverId());
-        notificationDto.setServiceName(entity.getServiceName());
-        notificationDto.setEventId(entity.getEventId());
-        notificationDto.setIsReaded(entity.getIsReaded());
 
-        NotificationsDto notificationsDto = new NotificationsDto();
-        notificationsDto.setTimeStamp(entity.getSentTime());
-        notificationsDto.setData(notificationDto);
 
-        return notificationsDto;
-    }
+
+
+
+
 
 
 
