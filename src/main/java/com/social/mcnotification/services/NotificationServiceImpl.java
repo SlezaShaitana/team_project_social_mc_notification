@@ -306,8 +306,7 @@ import java.util.stream.Collectors;
         String direction = sortParts[1];
 
         Sort sortObj = Sort.by("desc".equalsIgnoreCase(direction) ? Sort.Order.desc(field) : Sort.Order.asc(field));
-
-
+        
         Specification<NotificationEntity> spec = Specification.where(NotificationsSpecifications.byReceiverId(user.getId()));
         spec = spec.and(NotificationsSpecifications.isReaded(false));
 
