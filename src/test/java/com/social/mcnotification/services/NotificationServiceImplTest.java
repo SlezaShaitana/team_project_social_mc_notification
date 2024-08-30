@@ -10,6 +10,7 @@ import com.social.mcnotification.security.jwt.JwtTokenFilter;
 import com.social.mcnotification.security.jwt.UserModel;
 import com.social.mcnotification.services.helper.Mapper;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -73,6 +74,7 @@ public class NotificationServiceImplTest {
     }
 
     @Test
+    @DisplayName("Test getCurrentUser method")
     public void testGetCurrentUser() {
         List<String> roles = new ArrayList<>();
         roles.add("USER");
@@ -84,6 +86,7 @@ public class NotificationServiceImplTest {
 
 
     @Test
+    @DisplayName("Test getNotificationSetting method")
     public void testGetNotificationSettings() {
         NotificationSettingEntity entity = new NotificationSettingEntity();
         entity.setUserId(user.getId());
@@ -103,7 +106,8 @@ public class NotificationServiceImplTest {
     }
 
     @Test
-    public void UpdateNotificationSettings() {
+    @DisplayName("Test updateNotificationSetting method")
+    public void testUpdateNotificationSettings() {
         NotificationType type = NotificationType.POST;
         NotificationUpdateDto updateDto = new NotificationUpdateDto(false, type);
 
@@ -122,7 +126,8 @@ public class NotificationServiceImplTest {
     }
 
     @Test
-    public void markAllEventsAsRead() {
+    @DisplayName("Test markAllEventsAsRead method")
+    public void testMarkAllEventsAsRead() {
         List<NotificationEntity> entityList = new ArrayList<>();
 
         for (int i = 1; i <= 5; i ++) {
@@ -144,7 +149,8 @@ public class NotificationServiceImplTest {
 
 
     @Test
-    public void createNotificationSettings() {
+    @DisplayName("Test createNotificationSettings method")
+    public void testCreateNotificationSettings() {
         UUID idUser = user.getId();
         NotificationSettingEntity notificationSetting = new NotificationSettingEntity();
         notificationSetting.setUserId(idUser);
@@ -158,7 +164,8 @@ public class NotificationServiceImplTest {
 
 
     @Test
-    public void createNotification() {
+    @DisplayName("Test createNotification method")
+    public void testCreateNotification() {
 
         EventNotificationDto eventNotificationDto = new EventNotificationDto(
                 UUID.randomUUID(),
@@ -176,6 +183,7 @@ public class NotificationServiceImplTest {
 
 
     @Test
+    @DisplayName("Test getEventsCount method")
     public void testGetEventsCount() {
         List<NotificationEntity> entityList = new ArrayList<>();
 
