@@ -1,0 +1,4 @@
+tprov:
+  profile: TEST
+  description: TEST profile rules now
+  format: yyyyy.MMMMM.dd GGG hh:mm aaa

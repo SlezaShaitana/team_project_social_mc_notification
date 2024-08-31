@@ -1,6 +1,13 @@
+tprov:
+  profile: DEV
+  description: DEV profile activated
+  format: MM-dd'T'HH:mm:ss.SSSZ
+
 spring:
   application:
     name: mc-notification
+
+    
   datasource:
     url: jdbc:postgresql://postgres_db/mc_not
     username: postgres
