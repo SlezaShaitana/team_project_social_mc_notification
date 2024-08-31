@@ -26,7 +26,7 @@ public class JwtUtils {
     }
 
     public List<String> getRoles(String token) {
-        return getClaimsFromToken(token).get("roles", List.class);
+        return getClaimsFromToken(token).get("role", List.class);
     }
 
     private Claims getClaimsFromToken(String token) {
@@ -59,7 +59,7 @@ public class JwtUtils {
 
         UUID id = UUID.fromString(claims.get("id", String.class));
         String email = claims.getSubject();
-        List<String> roles = claims.get("roles", List.class);
+        List<String> roles = claims.get("role", List.class);
 
         return new UserModel(id, token, email, roles);
     }
