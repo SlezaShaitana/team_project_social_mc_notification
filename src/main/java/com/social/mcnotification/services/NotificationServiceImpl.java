@@ -39,14 +39,14 @@ import java.util.stream.Collectors;
         private final NotificationRepository notificationRepository;
         private final NotificationSettingRepository notificationSettingRepository;
         private final Mapper mapper;
-        private final Logger logger = LogManager.getLogger(NotificationServiceImpl.class);
+//        private final Logger logger = LogManager.getLogger(NotificationServiceImpl.class);
 
         private void checkPrintUserInfo(UserModel user) {
-            logger.info("id: {}, token: {}, email: {}, roles: {}",
-                    user.getId(),
-                    user.getToken(),
-                    user.getEmail(),
-                    user.getRoles());
+//            logger.info("id: {}, token: {}, email: {}, roles: {}",
+//                    user.getId(),
+//                    user.getToken(),
+//                    user.getEmail(),
+//                    user.getRoles());
         }
 
         public UserModel getCurrentUser() {
@@ -63,11 +63,14 @@ import java.util.stream.Collectors;
         @Override
         public NotificationSettingDto getNotificationSettings() {
             UserModel user = getCurrentUser();
-            logger.log(Level.INFO, "Getting notification settings for user: {}", user.getId());
+//            logger.log(Level.INFO, "Getting notification settings for user: {}", user.getId());
+
+            log.info("Getting notification settings for user: {}", user.getId());
 
             NotificationSettingEntity settingEntity = notificationSettingRepository.findByUserId(user.getId());
             if (settingEntity == null) {
-                logger.log(Level.ERROR, "Notification settings not found for user: " + user.getId());
+//                logger.log(Level.ERROR, "Notification settings not found for user: " + user.getId());
+                log.info("Notification settings not found for user: " + user.getId());
             }
 
             return mapper.mapToNotificationSettingDto(settingEntity);
@@ -76,7 +79,9 @@ import java.util.stream.Collectors;
         @Override
         public void updateNotificationSettings(NotificationUpdateDto notificationUpdateDto) {
             UserModel user = getCurrentUser();
-            logger.log(Level.INFO, "Updating notification settings for user: {}", user.getId());
+//            logger.log(Level.INFO, "Updating notification settings for user: {}", user.getId());
+
+            log.info("Updating notification settings for user: {}", user.getId());
 
             NotificationSettingEntity settingEntity = notificationSettingRepository.findByUserId(user.getId());
 
@@ -99,17 +104,20 @@ import java.util.stream.Collectors;
             }
 
             notificationSettingRepository.save(settingEntity);
-            logger.log(Level.INFO, "Notification settings updated for user: {} to {}", user.getId(), setting);
+//            logger.log(Level.INFO, "Notification settings updated for user: {} to {}", user.getId(), setting);
+            log.info("Notification settings updated for user: {} to {}", user.getId(), setting);
         }
 
         @Override
         public void markAllEventsAsRead() {
             UserModel user = getCurrentUser();
-            logger.log(Level.INFO, "Marking all notifications as read for user: {}", user.getId());
+//            logger.log(Level.INFO, "Marking all notifications as read for user: {}", user.getId());
+            log.info("Marking all notifications as read for user: {}", user.getId());
 
             List<NotificationEntity> notifications = notificationRepository.findByReceiverId(user.getId());
             if (notifications.isEmpty()) {
-                logger.log(Level.INFO, "No notifications found for user: {} ", user.getId());
+//                logger.log(Level.INFO, "No notifications found for user: {} ", user.getId());
+                log.info("No notifications found for user: {} ", user.getId());
             } else {
                 notifications.forEach(notification -> notification.setIsReaded(true));
                 notificationRepository.saveAll(notifications);
@@ -121,7 +129,8 @@ import java.util.stream.Collectors;
             if (id == null) {
                 throw new IllegalArgumentException("ID cannot be null");
             }
-            logger.log(Level.INFO, "Creating notification settings for user: {}", id);
+//            logger.log(Level.INFO, "Creating notification settings for user: {}", id);
+            log.info("Creating notification settings for user: {}", id);
 
             NotificationSettingDto notificationSettingDto = new NotificationSettingDto();
             notificationSettingDto.setUserId(id);
@@ -133,10 +142,12 @@ import java.util.stream.Collectors;
         @Override
         public void createNotification(EventNotificationDto eventNotificationDto) {
             UserModel user = getCurrentUser();
-            logger.log(Level.INFO, "Creating event notification for user: {}", user.getId());
+//            logger.log(Level.INFO, "Creating event notification for user: {}", user.getId());
+            log.info("Creating event notification for user: {}", user.getId());
 
             if (eventNotificationDto == null) {
-                logger.log(Level.INFO, "EventNotificationDto is null");
+//                logger.log(Level.INFO, "EventNotificationDto is null");
+                log.info("EventNotificationDto is null");
             } else {
             NotificationEntity notification = new NotificationEntity();
             notification.setId(UUID.randomUUID());
@@ -298,8 +309,8 @@ import java.util.stream.Collectors;
     @Override
     public Page<NotificationsDto> getNotifications(Integer page, Integer size, String sort) {
         UserModel user = getCurrentUser();
-        logger.log(Level.INFO, "get Notification");
-        logger.info("get Notification");
+//        logger.log(Level.INFO, "get Notification");
+        log.info("get Notification");
 
         String[] sortParts = sort.split(",");
         String field = sortParts[0];
@@ -389,11 +400,13 @@ import java.util.stream.Collectors;
         @Override
         public NotificationCountDto getEventsCount() {
             UserModel user = getCurrentUser();
-            logger.log(Level.INFO, "Counting events for user: {}", user.getId());
+//            logger.log(Level.INFO, "Counting events for user: {}", user.getId());
+            log.info("Counting events for user: {}", user.getId());
 
             List<NotificationEntity> notifications = notificationRepository.findByReceiverId(user.getId());
             if (notifications.isEmpty()) {
-                logger.log(Level.INFO, "No notifications found for user: {} ", user.getId());
+//                logger.log(Level.INFO, "No notifications found for user: {} ", user.getId());
+                log.info("No notifications found for user: {} ", user.getId());
             }
 
             long unreadCount = notifications.stream()
