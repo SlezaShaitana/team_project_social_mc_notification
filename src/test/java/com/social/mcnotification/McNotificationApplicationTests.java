@@ -6,12 +6,15 @@
 //import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 //import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 //
+//import com.social.mcnotification.controller.ApiController;
 //import org.junit.jupiter.api.BeforeEach;
 //import org.junit.jupiter.api.Test;
 //import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+//import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 //import org.springframework.boot.test.context.SpringBootTest;
 //import org.springframework.http.MediaType;
+//import org.springframework.security.test.context.support.WithMockUser;
 //import org.springframework.test.web.servlet.MockMvc;
 //
 //import com.social.mcnotification.dto.*;
@@ -53,9 +56,8 @@
 //
 //@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 //@AutoConfigureMockMvc
+//@WebMvcTest(ApiController.class)
 //class McNotificationApplicationTests {
-//
-//
 //
 //
 //	@LocalServerPort
@@ -67,7 +69,9 @@
 //	@Autowired
 //	private NotificationSettingRepository notificationSettingRepository;
 //
-//	private TestRestTemplate template = new TestRestTemplate();
+//	private final TestRestTemplate template = new TestRestTemplate();
+//
+//	private final UUID id = UUID.fromString("aa59a222-5452-41f8-86e9-0d7631621d6d");
 //
 //	public static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:14");
 //
@@ -94,30 +98,28 @@
 //		List<NotificationEntity> notificationEntities = new ArrayList<>();
 //		List<NotificationSettingEntity> notificationSettingEntities = new ArrayList<>();
 //
-//		NotificationEntity notification = new NotificationEntity();
-//		notification.setNotificationType(NotificationType.FRIEND_BIRTHDAY);
-//		notification.setId(UUID.fromString("1"));
-//		notification.setAuthorId(UUID.fromString("5"));
-//		notification.setReceiverId(UUID.fromString("10"));
-//		notification.setContent("Hello");
-//		notification.setIsReaded(false);
-//		notification.setServiceName(MicroServiceName.ACCOUNT);
-//		String date = LocalDateTime.now().toString();
-//		notification.setSentTime(Timestamp.valueOf(date));
-//		notificationEntities.add(notification);
+//        for (int i = 1; i < 4; i++) {
+//			NotificationEntity notification = new NotificationEntity();
+//			notification.setNotificationType(NotificationType.FRIEND_BIRTHDAY);
 //
-//		NotificationEntity notification2 = new NotificationEntity();
-//		notification2.setNotificationType(NotificationType.FRIEND_BIRTHDAY);
-//		notification2.setId(UUID.fromString("1"));
-//		notification2.setAuthorId(UUID.fromString("5"));
-//		notification2.setReceiverId(UUID.fromString("10"));
-//		notification2.setIsReaded(false);
-//		notificationEntities.add(notification2);
+//			if (i <= 2) {
+//				notification.setReceiverId(id);
+//			}
 //
-//		notificationRepository.saveAll(notificationEntities);
+//			notification.setAuthorId(UUID.randomUUID());
+//			notification.setReceiverId(UUID.randomUUID());
+//			notification.setContent("У друга день рождение! ");
+//			notification.setIsReaded(false);
+//			notification.setServiceName(MicroServiceName.ACCOUNT);
+//			String date = LocalDateTime.now().toString();
+//			notification.setSentTime(Timestamp.valueOf(date));
+//			notificationEntities.add(notification);
+//			notificationRepository.saveAll(notificationEntities);
+//        }
 //
 //		NotificationSettingEntity notificationSettingEntity = new NotificationSettingEntity();
-//		notificationSettingEntity.setId(UUID.fromString("5"));
+//		notificationSettingEntity.setUserId(id);
+//		notificationSettingEntity.setId(UUID.randomUUID());
 //		notificationSettingEntity.setEnableLike(true);
 //		notificationSettingEntity.setEnableSendEmailMessage(false);
 //		notificationSettingEntity.setEnablePost(true);
@@ -125,14 +127,6 @@
 //		notificationSettingEntity.setEnableMessage(false);
 //		notificationSettingEntity.setEnablePostComment(true);
 //		notificationSettingEntities.add(notificationSettingEntity);
-//
-//		NotificationSettingEntity notificationSetting2 = new NotificationSettingEntity();
-//		notificationSetting2.setId(UUID.fromString("1172"));
-//		notificationSetting2.setEnableLike(true);
-//		notificationSetting2.setEnableSendEmailMessage(false);
-//		notificationSetting2.setEnablePostComment(true);
-//		notificationSettingEntities.add(notificationSetting2);
-//
 //		notificationSettingRepository.saveAll(notificationSettingEntities);
 //
 //	}
@@ -153,18 +147,20 @@
 //
 //
 //	@Test
+//	@WithMockUser
 //	@DisplayName("Http-ответ со статусом 'ok'")
 //	public void testGetNotificationSettings() {
+//
 //		ResponseEntity<NotificationSettingEntity> response = template.getRestTemplate()
 //				.getForEntity("http://localhost:" + port + "/api/v1/notifications/settings", NotificationSettingEntity.class);
 //		assertTrue(response.getStatusCode().is2xxSuccessful()); //status code 200?
-//		assertEquals(1, response.getBody().getId());
+////		assertEquals(1, response.getBody().getUserId());
 //	}
 //
 //	@Test
 //	@DisplayName("Http-ответ со статусом 'ok'")
 //	public void testUpdateNotificationSettings() {
-//		NotificationSettingEntity notificationSettingEntity = notificationSettingRepository.findById(UUID.fromString("5"));
+//		NotificationSettingEntity notificationSettingEntity = notificationSettingRepository.findByUserId(UUID.fromString("5"));
 //		notificationSettingEntity.setEnablePost(false);
 //		notificationSettingRepository.save(notificationSettingEntity);
 //

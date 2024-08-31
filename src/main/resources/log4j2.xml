@@ -35,7 +35,8 @@
 
 
     <loggers>
-        <root level="debug">
+<!--        <root level="debug">-->
+        <root level="info">
             <appender-ref ref="Console"/>
             <appender-ref ref="SearchFile" level="info"/>
             <appender-ref ref="ErrorsFile" level="error"/>
