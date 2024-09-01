@@ -2,14 +2,14 @@ version: '2'
 services:
 
   postgres:
-#    container_name: pg_container_for_mc
+    #    container_name: pg_container_for_mc
     container_name: postgres_db
     image: postgres
     restart: always
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: mc_not
+      POSTGRES_USER: skillbox
+      POSTGRES_PASSWORD: skillbox
+      POSTGRES_DB: not
 
     ports:
       - "5435:5432"

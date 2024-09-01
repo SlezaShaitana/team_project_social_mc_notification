@@ -28,12 +28,14 @@ spring:
     bootstrap-servers: 79.174.80.200:9092
     kafkaMessageTopic: "notification-topic"
     kafkaMessageGroupId: "notification-topic-0"
+
+    kafkaMessageTopicAuth: "registerTopic"
+    kafkaMessageGroupIdAuth: "register-topic-0"
 #    auto-offset-reset: earliest
 #    key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
 #    spring.kafka.consumer.value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
 
-    kafkaMessageTopicAuth: "registerTopic"
-    kafkaMessageGroupIdAuth: "register-topic-0"
+
 
 
 app:

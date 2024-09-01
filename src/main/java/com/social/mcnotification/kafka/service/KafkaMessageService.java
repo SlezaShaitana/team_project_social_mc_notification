@@ -12,11 +12,7 @@ import com.social.mcnotification.model.NotificationSettingEntity;
 import com.social.mcnotification.repository.NotificationRepository;
 import com.social.mcnotification.repository.NotificationSettingRepository;
 import com.social.mcnotification.services.helper.Mapper;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 

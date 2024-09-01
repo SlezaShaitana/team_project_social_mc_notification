@@ -1,19 +1,16 @@
 package com.social.mcnotification.kafka.listener;
 
 import com.social.mcnotification.dto.NotificationDto;
-import com.social.mcnotification.dto.RegistrationDto;
 import com.social.mcnotification.kafka.service.KafkaMessageService;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-import java.util.UUID;
-
-@Component
+//@Component
+@Service
 @Slf4j
 @RequiredArgsConstructor
 public class NotificationConsumer {
@@ -23,7 +20,12 @@ public class NotificationConsumer {
     public void listen(@Payload NotificationDto notificationDto) {
         log.info("Received notification: {}", notificationDto);
 
-        kafkaMessageService.savingToNotificationRepository(notificationDto);
+        try {
+            kafkaMessageService.savingToNotificationRepository(notificationDto);
+            log.info("Notification successfully saved: {}", notificationDto);
+        } catch (Exception e) {
+            log.error("Error saving notification: {}", notificationDto, e);
+        }
 
     }
 
