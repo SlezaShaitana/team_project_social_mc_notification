@@ -1,0 +1,49 @@
+tprov:
+  profile: LOCAL
+  description: LOCAL profile activated
+  format: MM-dd'T'HH:mm:ss.SSSZ
+
+spring:
+  application:
+    name: mc-notification
+
+
+  datasource:
+    url: jdbc:postgresql://localhost:5435/not
+    username: skillbox
+    password: skillbox
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    show-sql: true
+    hibernate.ddl-auto: create-drop
+
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.xml
+    enabled: true
+    drop-first: false
+    clear-check-sums: true
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    kafkaMessageTopic: "notification-topic"
+    kafkaMessageGroupId: "notification-topic-0"
+
+    kafkaMessageTopicAuth: "registerTopic"
+    kafkaMessageGroupIdAuth: "register-topic-0"
+
+
+app:
+  jwt:
+    secret: "53A73E5F1C4E0A2D3B5F2D784E6A1B423D6F247D1F6E5C3A596D635A75327855"
+
+server:
+  port: 8089
+#eureka:
+#  client:
+#    service-url:
+#      defaultZone: http://mc-eureka-conteiner:8888/eureka/
+#    register-with-eureka: true
+#    fetch-registry: true
+#  instance:
+#    preferIpAddress: true

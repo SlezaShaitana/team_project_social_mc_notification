@@ -38,30 +38,6 @@ public class KafkaConfiguration {
 
     //notification
 
-
-//    @Bean
-//    public ProducerFactory<String, NotificationDto> kafkaMessageProducerFactory(ObjectMapper objectMapper) {
-//        Map<String, Object> config = new HashMap<>();
-//        config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootStrapServers);
-//        config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-//        config.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
-//
-//        return new DefaultKafkaProducerFactory<>(config, new StringSerializer(), new JsonSerializer<>(objectMapper));
-//
-//    }
-
-//    @Bean
-//    public KafkaTemplate<String, NotificationDto> kafkaTemplate(ProducerFactory<String, NotificationDto> kafkaMessageProducerFactory) {
-//        return new KafkaTemplate<>(kafkaMessageProducerFactory);
-//    }
-
-
-
-
-
-
-
-
     @Bean
     public ConsumerFactory<String, NotificationDto> kafkaMessageConsumerFactory(ObjectMapper objectMapper) {
         Map<String, Object> config = new HashMap<>();

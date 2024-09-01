@@ -3,13 +3,22 @@ services:
 
   postgres:
 #    container_name: pg_container_for_mc
+#    container_name: postgres_db
+#    image: postgres
+#    restart: always
+#    environment:
+#      POSTGRES_USER: postgres
+#      POSTGRES_PASSWORD: postgres
+#      POSTGRES_DB: mc_not
+
     container_name: postgres_db
     image: postgres
     restart: always
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: mc_not
+      POSTGRES_USER: skillbox
+      POSTGRES_PASSWORD: skillbox
+      POSTGRES_DB: not
+
     ports:
       - "5435:5432"
 
@@ -35,14 +44,14 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
-  eureka-server:
-    image: eurekaserver:latest
-    container_name: eureka-server
-    ports:
-      - "8888:8888"
-    networks:
-      - eureka-network
-
-networks:
-  eureka-network:
-    driver: bridge
+#  eureka-server:
+#    image: eurekaserver:latest
+#    container_name: eureka-server
+#    ports:
+#      - "8888:8888"
+#    networks:
+#      - eureka-network
+#
+#networks:
+#  eureka-network:
+#    driver: bridge
