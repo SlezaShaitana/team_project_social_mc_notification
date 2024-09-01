@@ -27,12 +27,12 @@ public class NotificationConsumer {
 
     }
 
-    @KafkaListener(topics = "${spring.kafka.kafkaMessageTopicAuth}", groupId = "${spring.kafka.kafkaMessageGroupIdAuth}", containerFactory = "authKafkaMessageConcurrentKafkaListenerContainerFactory")
-    public void listenAuth(@Payload RegistrationDto registrationDto) {
-        log.info("Received registration: {}", registrationDto);
-
-        kafkaMessageService.setNotificationMessageForAuthMicroservice(registrationDto);
-    }
+//    @KafkaListener(topics = "${spring.kafka.kafkaMessageTopicAuth}", groupId = "${spring.kafka.kafkaMessageGroupIdAuth}", containerFactory = "authKafkaMessageConcurrentKafkaListenerContainerFactory")
+//    public void listenAuth(@Payload RegistrationDto registrationDto) {
+//        log.info("Received registration: {}", registrationDto);
+//
+//        kafkaMessageService.setNotificationMessageForAuthMicroservice(registrationDto);
+//    }
 
 
 //    @KafkaListener(topics = "registerTopic", groupId = "${spring.kafka.kafkaMessageGroupId}", containerFactory = "authkKafkaMessageConcurrentKafkaListenerContainerFactory")

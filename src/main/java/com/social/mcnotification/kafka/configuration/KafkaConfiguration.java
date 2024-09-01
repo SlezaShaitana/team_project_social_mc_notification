@@ -47,15 +47,15 @@ public class KafkaConfiguration {
 //        return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(), new JsonDeserializer<>(objectMapper));
 //    }
 
-    @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, RegistrationDto> authKafkaMessageConcurrentKafkaListenerContainerFactory(
-            ConsumerFactory<String, RegistrationDto> kafkaMessageConsumerFactory
-    ) {
-        ConcurrentKafkaListenerContainerFactory<String, RegistrationDto> factory = new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(kafkaMessageConsumerFactory);
-
-        return factory;
-    }
+//    @Bean
+//    public ConcurrentKafkaListenerContainerFactory<String, RegistrationDto> authKafkaMessageConcurrentKafkaListenerContainerFactory(
+//            ConsumerFactory<String, RegistrationDto> kafkaMessageConsumerFactory
+//    ) {
+//        ConcurrentKafkaListenerContainerFactory<String, RegistrationDto> factory = new ConcurrentKafkaListenerContainerFactory<>();
+//        factory.setConsumerFactory(kafkaMessageConsumerFactory);
+//
+//        return factory;
+//    }
 //
 //    @Bean
 //    public ConsumerFactory<String, NotificationDto> kafkaMessageConsumerFactory(ObjectMapper objectMapper) {
@@ -177,29 +177,29 @@ public class KafkaConfiguration {
     }
 
 
-    @Bean
-    public ConsumerFactory<String, RegistrationDto> authKafkaMessageConsumerFactory(ObjectMapper objectMapper) {
-        Map<String, Object> config = new HashMap<>();
-        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootStrapServers);
-        config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-//        config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
-        config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
-        config.put(ConsumerConfig.GROUP_ID_CONFIG, kafkaMessageGroupId);
-        config.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
-
-//        JsonDeserializer<NotificationDto> jsonDeserializer = new JsonDeserializer<>(NotificationDto.class);
-//        jsonDeserializer.setRemoveTypeHeaders(false);
-//        jsonDeserializer.addTrustedPackages("*");
-//        jsonDeserializer.setUseTypeMapperForKey(true);
+//    @Bean
+//    public ConsumerFactory<String, RegistrationDto> authKafkaMessageConsumerFactory(ObjectMapper objectMapper) {
+//        Map<String, Object> config = new HashMap<>();
+//        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootStrapServers);
+//        config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+////        config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
+//        config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+//        config.put(ConsumerConfig.GROUP_ID_CONFIG, kafkaMessageGroupId);
+//        config.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
 //
-//        ErrorHandlingDeserializer<NotificationDto> errorHandlingDeserializer =
-//                new ErrorHandlingDeserializer<>(jsonDeserializer);
+////        JsonDeserializer<NotificationDto> jsonDeserializer = new JsonDeserializer<>(NotificationDto.class);
+////        jsonDeserializer.setRemoveTypeHeaders(false);
+////        jsonDeserializer.addTrustedPackages("*");
+////        jsonDeserializer.setUseTypeMapperForKey(true);
+////
+////        ErrorHandlingDeserializer<NotificationDto> errorHandlingDeserializer =
+////                new ErrorHandlingDeserializer<>(jsonDeserializer);
+////
+////        return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(), errorHandlingDeserializer);
 //
-//        return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(), errorHandlingDeserializer);
-
-
-        return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(), new JsonDeserializer<>(objectMapper));
-    }
+//
+//        return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(), new JsonDeserializer<>(objectMapper));
+//    }
 
 
 }
