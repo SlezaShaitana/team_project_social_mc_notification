@@ -305,7 +305,7 @@ import java.util.stream.Collectors;
 //                .empty(false)  // Уточнить
 //                .build();
 //    }
-    
+
     @Override
     public PageNotificationsDto getNotifications(Integer page, Integer size, String sort) {
         UserModel user = getCurrentUser();

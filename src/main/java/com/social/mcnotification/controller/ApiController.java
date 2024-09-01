@@ -66,7 +66,7 @@ public class ApiController {
 
 
     @GetMapping("/page")
-    public PageNotificationsDto getNotifications(@RequestParam(name = "page", defaultValue = "0") Integer page,
+    public ResponseEntity<PageNotificationsDto> getNotifications(@RequestParam(name = "page", defaultValue = "0") Integer page,
                                                  @RequestParam(name = "size", defaultValue = "10") Integer size,
                                                  @RequestParam(name = "sort", required = false) String sort) {
 
