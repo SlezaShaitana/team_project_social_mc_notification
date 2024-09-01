@@ -34,18 +34,18 @@ public class KafkaConfiguration {
 
     @Value("${spring.kafka.kafkaMessageGroupIdAuth}")
     private String kafkaMassageGroupIdAuth;
-
-    @Bean
-    public ConsumerFactory<String, RegistrationDto> authKafkaMessageConsumerFactory(ObjectMapper objectMapper) {
-        Map<String, Object> config = new HashMap<>();
-        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootStrapServers);
-        config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
-        config.put(ConsumerConfig.GROUP_ID_CONFIG, kafkaMassageGroupIdAuth);
-        config.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
-
-        return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(), new JsonDeserializer<>(objectMapper));
-    }
+//
+//    @Bean
+//    public ConsumerFactory<String, RegistrationDto> authKafkaMessageConsumerFactory(ObjectMapper objectMapper) {
+//        Map<String, Object> config = new HashMap<>();
+//        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootStrapServers);
+//        config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+//        config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+//        config.put(ConsumerConfig.GROUP_ID_CONFIG, kafkaMassageGroupIdAuth);
+//        config.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
+//
+//        return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(), new JsonDeserializer<>(objectMapper));
+//    }
 
     @Bean
     public ConcurrentKafkaListenerContainerFactory<String, RegistrationDto> authKafkaMessageConcurrentKafkaListenerContainerFactory(
@@ -56,18 +56,18 @@ public class KafkaConfiguration {
 
         return factory;
     }
-
-    @Bean
-    public ConsumerFactory<String, NotificationDto> kafkaMessageConsumerFactory(ObjectMapper objectMapper) {
-        Map<String, Object> config = new HashMap<>();
-        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootStrapServers);
-        config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
-        config.put(ConsumerConfig.GROUP_ID_CONFIG, kafkaMessageGroupId);
-        config.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
-
-        return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(), new JsonDeserializer<>(objectMapper));
-    }
+//
+//    @Bean
+//    public ConsumerFactory<String, NotificationDto> kafkaMessageConsumerFactory(ObjectMapper objectMapper) {
+//        Map<String, Object> config = new HashMap<>();
+//        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootStrapServers);
+//        config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+//        config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+//        config.put(ConsumerConfig.GROUP_ID_CONFIG, kafkaMessageGroupId);
+//        config.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
+//
+//        return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(), new JsonDeserializer<>(objectMapper));
+//    }
 
     @Bean
     public ConcurrentKafkaListenerContainerFactory<String, NotificationDto> kafkaMessageConcurrentKafkaListenerContainerFactory(
@@ -128,7 +128,7 @@ public class KafkaConfiguration {
 
 
 //    @Bean
-//    public ConsumerFactory<String, NotificationDto> kafkaMessageConsumerFactory(ObjectMapper objectMapper) {
+//    public ConsumerFactory<String, NotificationDto> authKafkaMessageConsumerFactory(ObjectMapper objectMapper) {
 //        Map<String, Object> config = new HashMap<>();
 //        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootStrapServers);
 //        config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
@@ -150,6 +150,31 @@ public class KafkaConfiguration {
 //
 //        return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(), new JsonDeserializer<>(objectMapper));
 //    }
+
+
+    @Bean
+    public ConsumerFactory<String, NotificationDto> kafkaMessageConsumerFactory(ObjectMapper objectMapper) {
+        Map<String, Object> config = new HashMap<>();
+        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootStrapServers);
+        config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+//        config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
+        config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+        config.put(ConsumerConfig.GROUP_ID_CONFIG, kafkaMessageGroupId);
+        config.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
+
+//        JsonDeserializer<NotificationDto> jsonDeserializer = new JsonDeserializer<>(NotificationDto.class);
+//        jsonDeserializer.setRemoveTypeHeaders(false);
+//        jsonDeserializer.addTrustedPackages("*");
+//        jsonDeserializer.setUseTypeMapperForKey(true);
 //
+//        ErrorHandlingDeserializer<NotificationDto> errorHandlingDeserializer =
+//                new ErrorHandlingDeserializer<>(jsonDeserializer);
+//
+//        return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(), errorHandlingDeserializer);
+
+
+        return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(), new JsonDeserializer<>(objectMapper));
+    }
+
 
 }

@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
@@ -19,7 +20,7 @@ public class NotificationConsumer {
     private final KafkaMessageService kafkaMessageService;
 
     @KafkaListener(topics = "${spring.kafka.kafkaMessageTopic}", groupId = "${spring.kafka.kafkaMessageGroupId}", containerFactory = "kafkaMessageConcurrentKafkaListenerContainerFactory")
-    public void listen(NotificationDto notificationDto) {
+    public void listen(@Payload NotificationDto notificationDto) {
         log.info("Received notification: {}", notificationDto);
 
         kafkaMessageService.savingToNotificationRepository(notificationDto);
@@ -27,7 +28,7 @@ public class NotificationConsumer {
     }
 
     @KafkaListener(topics = "${spring.kafka.kafkaMessageTopicAuth}", groupId = "${spring.kafka.kafkaMessageGroupIdAuth}", containerFactory = "authKafkaMessageConcurrentKafkaListenerContainerFactory")
-    public void listenAuth(RegistrationDto registrationDto) {
+    public void listenAuth(@Payload RegistrationDto registrationDto) {
         log.info("Received registration: {}", registrationDto);
 
         kafkaMessageService.setNotificationMessageForAuthMicroservice(registrationDto);
