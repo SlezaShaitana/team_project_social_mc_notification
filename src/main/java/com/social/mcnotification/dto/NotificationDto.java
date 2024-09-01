@@ -25,7 +25,6 @@ public class NotificationDto {
     private NotificationType notificationType;
     @JsonProperty("sentTime")
     private Timestamp sentTime; //Timestamp
-    @JsonProperty("receiverId")
     private UUID receiverId;
     @JsonProperty("serviceName")
     private MicroServiceName serviceName;
