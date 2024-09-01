@@ -5,5 +5,4 @@ import java.util.UUID;
 public class AuthorityDTO {
     private UUID id;
     private String authority;
-
 }

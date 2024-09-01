@@ -43,7 +43,6 @@ public class NotificationsSpecifications {
     }
 
 
-
     public static Specification<NotificationEntity> byAuthorId(UUID authorId) {
         return (root, criteriaQuery, criteriaBuilder) -> {
             if (authorId == null) {

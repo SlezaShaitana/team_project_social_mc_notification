@@ -3,9 +3,7 @@ package com.social.mcnotification.services;
 import com.social.mcnotification.dto.*;
 import com.social.mcnotification.dto.response.PageNotificationsDto;
 import com.social.mcnotification.dto.response.PageableObject;
-import com.social.mcnotification.exceptions.InvalidNotificationSettingException;
 import com.social.mcnotification.exceptions.InvalidNotificationTypeException;
-import com.social.mcnotification.exceptions.NotificationNotFoundException;
 import com.social.mcnotification.exceptions.NotificationSettingNotFoundException;
 import com.social.mcnotification.model.NotificationEntity;
 import com.social.mcnotification.model.NotificationSettingEntity;
@@ -29,128 +27,110 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
-    @RequiredArgsConstructor
-    @Slf4j
-    public class NotificationServiceImpl implements NotificationService {
+@RequiredArgsConstructor
+@Slf4j
+public class NotificationServiceImpl implements NotificationService {
 
-        private final NotificationRepository notificationRepository;
-        private final NotificationSettingRepository notificationSettingRepository;
-        private final Mapper mapper;
+    private final NotificationRepository notificationRepository;
+    private final NotificationSettingRepository notificationSettingRepository;
+    private final Mapper mapper;
 //        private final Logger logger = LogManager.getLogger(NotificationServiceImpl.class);
 
-        private void checkPrintUserInfo(UserModel user) {
-//            logger.info("id: {}, token: {}, email: {}, roles: {}",
-//                    user.getId(),
-//                    user.getToken(),
-//                    user.getEmail(),
-//                    user.getRoles());
+
+    public UserModel getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Object principal = authentication.getPrincipal();
+
+        if (authentication != null && authentication.getPrincipal() instanceof UserModel) {
+            return (UserModel) authentication.getPrincipal();
+        }
+        throw new IllegalStateException("Current user is not of type UserModel");
+    }
+
+
+    @Override
+    public NotificationSettingDto getNotificationSettings() {
+        UserModel user = getCurrentUser();
+        log.info("Getting notification settings for user: {}", user.getId());
+
+        NotificationSettingEntity settingEntity = notificationSettingRepository.findByUserId(user.getId());
+        if (settingEntity == null) {
+            log.info("Notification settings not found for user: " + user.getId());
         }
 
-        public UserModel getCurrentUser() {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            Object principal = authentication.getPrincipal();
+        return mapper.mapToNotificationSettingDto(settingEntity);
+    }
 
-            if (authentication != null && authentication.getPrincipal() instanceof UserModel) {
-                return (UserModel) authentication.getPrincipal();
-            }
-            throw new IllegalStateException("Current user is not of type UserModel");
+    @Override
+    public void updateNotificationSettings(NotificationUpdateDto notificationUpdateDto) {
+        UserModel user = getCurrentUser();
+        log.info("Updating notification settings for user: {}", user.getId());
+        NotificationSettingEntity settingEntity = notificationSettingRepository.findByUserId(user.getId());
+
+        if (settingEntity == null) {
+            log.error("Notification settings not found for user: {} ", user.getId());
+            throw new NotificationSettingNotFoundException("Notification settings not found for user");
+//            settingEntity = new NotificationSettingEntity();
+//            settingEntity.setUserId(getCurrentUser().getId());
         }
 
-
-        @Override
-        public NotificationSettingDto getNotificationSettings() {
-            UserModel user = getCurrentUser();
-//            logger.log(Level.INFO, "Getting notification settings for user: {}", user.getId());
-
-            log.info("Getting notification settings for user: {}", user.getId());
-
-            NotificationSettingEntity settingEntity = notificationSettingRepository.findByUserId(user.getId());
-            if (settingEntity == null) {
-//                logger.log(Level.ERROR, "Notification settings not found for user: " + user.getId());
-                log.info("Notification settings not found for user: " + user.getId());
-            }
-
-            return mapper.mapToNotificationSettingDto(settingEntity);
+        Boolean setting = notificationUpdateDto.getEnable();
+        switch (notificationUpdateDto.getNotificationType()) {
+            case POST -> settingEntity.setEnablePost(setting);
+            case POST_COMMENT -> settingEntity.setEnablePostComment(setting);
+            case COMMENT_COMMENT -> settingEntity.setEnableCommentComment(setting);
+            case MESSAGE -> settingEntity.setEnableMessage(setting);
+            case FRIEND_REQUEST -> settingEntity.setEnableFriendRequest(setting);
+            case FRIEND_BIRTHDAY -> settingEntity.setEnableFriendBirthday(setting);
+            case SEND_EMAIL_MESSAGE -> settingEntity.setEnableSendEmailMessage(setting);
+            default ->
+                    throw new InvalidNotificationTypeException("Unknown notification type: " + notificationUpdateDto.getNotificationType());
         }
 
-        @Override
-        public void updateNotificationSettings(NotificationUpdateDto notificationUpdateDto) {
-            UserModel user = getCurrentUser();
-//            logger.log(Level.INFO, "Updating notification settings for user: {}", user.getId());
+        notificationSettingRepository.save(settingEntity);
+        log.info("Notification settings updated for user: {} to {}", user.getId(), setting);
+    }
 
-            log.info("Updating notification settings for user: {}", user.getId());
+    @Override
+    public void markAllEventsAsRead() {
+        UserModel user = getCurrentUser();
+        log.info("Marking all notifications as read for user: {}", user.getId());
 
-            NotificationSettingEntity settingEntity = notificationSettingRepository.findByUserId(user.getId());
-
-            if (settingEntity == null) {
-                log.error("Notification settings not found for user: {} ", user.getId());
-                settingEntity = new NotificationSettingEntity();
-                settingEntity.setUserId(getCurrentUser().getId());
-            }
-
-            Boolean setting = notificationUpdateDto.getEnable();
-            switch (notificationUpdateDto.getNotificationType()) {
-                case POST -> settingEntity.setEnablePost(setting);
-                case POST_COMMENT -> settingEntity.setEnablePostComment(setting);
-                case COMMENT_COMMENT -> settingEntity.setEnableCommentComment(setting);
-                case MESSAGE -> settingEntity.setEnableMessage(setting);
-                case FRIEND_REQUEST -> settingEntity.setEnableFriendRequest(setting);
-                case FRIEND_BIRTHDAY -> settingEntity.setEnableFriendBirthday(setting);
-                case SEND_EMAIL_MESSAGE -> settingEntity.setEnableSendEmailMessage(setting);
-                default -> throw new InvalidNotificationTypeException("Unknown notification type: " + notificationUpdateDto.getNotificationType());
-            }
-
-            notificationSettingRepository.save(settingEntity);
-//            logger.log(Level.INFO, "Notification settings updated for user: {} to {}", user.getId(), setting);
-            log.info("Notification settings updated for user: {} to {}", user.getId(), setting);
+        List<NotificationEntity> notifications = notificationRepository.findByReceiverId(user.getId());
+        if (notifications.isEmpty()) {
+            log.info("No notifications found for user: {} ", user.getId());
+        } else {
+            notifications.forEach(notification -> notification.setIsReaded(true));
+            notificationRepository.saveAll(notifications);
         }
+        notificationRepository.deleteAll(notifications);
+    }
 
-        @Override
-        public void markAllEventsAsRead() {
-            UserModel user = getCurrentUser();
-//            logger.log(Level.INFO, "Marking all notifications as read for user: {}", user.getId());
-            log.info("Marking all notifications as read for user: {}", user.getId());
-
-            List<NotificationEntity> notifications = notificationRepository.findByReceiverId(user.getId());
-            if (notifications.isEmpty()) {
-//                logger.log(Level.INFO, "No notifications found for user: {} ", user.getId());
-                log.info("No notifications found for user: {} ", user.getId());
-            } else {
-                notifications.forEach(notification -> notification.setIsReaded(true));
-                notificationRepository.saveAll(notifications);
-            }
+    @Override
+    public Boolean createNotificationSettings(UUID id) {
+        if (id == null) {
+            throw new IllegalArgumentException("ID cannot be null");
         }
+        log.info("Creating notification settings for user: {}", id);
 
-        @Override
-        public Boolean createNotificationSettings(UUID id) {
-            if (id == null) {
-                throw new IllegalArgumentException("ID cannot be null");
-            }
-//            logger.log(Level.INFO, "Creating notification settings for user: {}", id);
-            log.info("Creating notification settings for user: {}", id);
+        NotificationSettingDto notificationSettingDto = new NotificationSettingDto();
+        notificationSettingDto.setUserId(id);
+        NotificationSettingEntity settingEntity = mapper.mapToSettingEntity(notificationSettingDto);
+        notificationSettingRepository.save(settingEntity);
+        return true;
+    }
 
-            NotificationSettingDto notificationSettingDto = new NotificationSettingDto();
-            notificationSettingDto.setUserId(id);
-            NotificationSettingEntity settingEntity = mapper.mapToSettingEntity(notificationSettingDto);
-            notificationSettingRepository.save(settingEntity);
-            return true;
-        }
+    @Override
+    public void createNotification(EventNotificationDto eventNotificationDto) {
+        UserModel user = getCurrentUser();
+        log.info("Creating event notification for user: {}", user.getId());
 
-        @Override
-        public void createNotification(EventNotificationDto eventNotificationDto) {
-            UserModel user = getCurrentUser();
-//            logger.log(Level.INFO, "Creating event notification for user: {}", user.getId());
-            log.info("Creating event notification for user: {}", user.getId());
-
-            if (eventNotificationDto == null) {
-//                logger.log(Level.INFO, "EventNotificationDto is null");
-                log.info("EventNotificationDto is null");
-            } else {
+        if (eventNotificationDto == null) {
+            log.info("EventNotificationDto is null");
+        } else {
             NotificationEntity notification = new NotificationEntity();
             notification.setId(UUID.randomUUID());
             notification.setSentTime(Timestamp.valueOf(LocalDateTime.now()));
@@ -160,151 +140,9 @@ import java.util.stream.Collectors;
             notification.setContent(eventNotificationDto.getContent());
             notification.setIsReaded(false);
             notificationRepository.save(notification);
-            }
         }
+    }
 
-
-//    public Page<NotificationsDto> getNotifications(Integer page, Integer size, List<String> sort) {
-//        UserModel user = getCurrentUser();
-//
-//        logger.log(Level.INFO, "Fetching notifications for user: {}", user.getId());
-//
-//        Sort sortObj = Sort.by(Sort.Order.desc("sentTime"));
-//        if (sort != null && !sort.isEmpty()) {
-//            sortObj = Sort.by(sort.stream()
-//                    .map(s -> s.startsWith("-") ? Sort.Order.desc(s.substring(1)) : Sort.Order.asc(s))
-//                    .toArray(Sort.Order[]::new));
-//        }
-//
-//        Specification<NotificationEntity> spec = Specification.where(NotificationsSpecifications.byReceiverId(user.getId()));
-//        Pageable pageable = PageRequest.of(page, size, sortObj);
-//
-//        Page<NotificationEntity> notificationEntities = notificationRepository.findAll(spec, pageable);
-//
-//        List<NotificationDto> notificationsDtos = notificationEntities.getContent().stream()
-//                .map(this::convertToNotificationsDto)
-//                .collect(Collectors.toList());
-//
-//        NotificationsDto n = new NotificationsDto();
-//        n.setTimeStamp(Timestamp.valueOf(LocalDateTime.now()));
-//        n.setData(notificationsDtos);
-//
-//        return new PageImpl<>(List.of(n), pageable, notificationEntities.getTotalElements());
-//    }
-//
-//    private NotificationDto convertToNotificationsDto(NotificationEntity entity) {
-//        NotificationDto notificationDto = new NotificationDto();
-//        notificationDto.setId(entity.getId());
-//        notificationDto.setAuthorId(entity.getAuthorId());
-//        notificationDto.setContent(entity.getContent());
-//        notificationDto.setNotificationType(entity.getNotificationType());
-//        notificationDto.setSentTime(entity.getSentTime());
-//        notificationDto.setReceiverId(entity.getReceiverId());
-//        notificationDto.setServiceName(entity.getServiceName());
-//        notificationDto.setEventId(entity.getEventId());
-//        notificationDto.setIsReaded(entity.getIsReaded());
-//
-//
-//        return notificationDto;
-//    }
-
-
-//    @Override
-//    public Page<NotificationsDto> getNotifications(Integer page, Integer size, List<String> sort) {
-//        UserModel user = getCurrentUser();
-//
-//        Sort sortObj = Sort.by(Sort.Order.desc("sentTime"));
-//        if (sort != null && !sort.isEmpty()) {
-//            sortObj = Sort.by(sort.stream()
-//                    .map(s -> s.startsWith("-") ? Sort.Order.desc(s.substring(1)) : Sort.Order.asc(s))
-//                    .toArray(Sort.Order[]::new));
-//        }
-//
-//        Specification<NotificationEntity> spec = Specification.where(NotificationsSpecifications.byReceiverId(user.getId()));
-//        Pageable pageable = PageRequest.of(page, size, sortObj);
-//
-//        Page<NotificationEntity> notificationPage = notificationRepository.findAll(spec, pageable);
-//
-//        NotificationsDto notificationsDtos = new NotificationsDto();
-//        notificationsDtos.setTimeStamp(Timestamp.valueOf(LocalDateTime.now()));
-//        notificationsDtos.setData(notificationPage.getContent().stream()
-//                .map(mapper::mapToNotificationDto).collect(Collectors.toList()));
-//
-//
-//        return new PageImpl<>(List.of(notificationsDtos), pageable, notificationPage.getTotalElements());
-//    }
-
-//    @Override
-//    public PageNotificationsDto getNotifications() throws MyBadCredentialsException {
-//        log.info("Сработал сервис Получение событий");
-//        Pageable page = new Pageable();
-//        page.setSort(new String[]{"desc"});
-//        page.setPage(0);
-//        page.setSize(15);
-//
-//        UUID uuid = currentUserConfig.getUuidCurrentUser();
-//
-//        org.springframework.data.domain.Pageable nextPage = PageRequest.of(page.getPage(), page.getSize());
-//        Page<Notification> pageNotifications = notificationRepository.getNotificationsByReceiverIdAndIsReaded(uuid , false, nextPage);
-//        log.info("Прочитано {} событий", pageNotifications.get().count());
-//
-//        NotificationsDto[] content = getNotificationsDtos(pageNotifications);
-//
-//        PageableObject pageableObject = getPageableObject(page);
-//
-//        return getPageNotificationsDto(page, pageNotifications, content, pageableObject);
-//    }
-
-
-//    private static NotificationsDto[] getNotificationsDtos(Page<Notification> pageNotifications) {
-//        List<NotificationsDto> list = new ArrayList<>();
-//
-//        pageNotifications.forEach(x -> {
-//            NotificationDto notificationDto = NotificationDto.builder()
-//                    .id(x.getId())
-//                    .authorId(x.getAuthorId())
-//                    .content(x.getContent())
-//                    .notificationType(x.getNotificationType())
-//                    .sentTime(x.getSentTime())
-//                    .build();
-//
-//            NotificationsDto notificationsDto = new NotificationsDto();
-//            notificationsDto.setTimeStamp(x.getSentTime());
-//            notificationsDto.setData(notificationDto);
-//
-//            list.add(notificationsDto);
-//        });
-//
-//        NotificationsDto[] content = list.toArray(new NotificationsDto[0]);
-//        return content;
-//    }
-//
-//    private static PageableObject getPageableObject(Pageable page) {
-//        return PageableObject.builder()
-//                .offset(page.getPage())
-//                .sort(null)  // Уточнить
-//                .paged(false)
-//                .pageSize(10)  // Уточнить
-//                .unpaged(true)
-//                .pageNumber(1)  // Уточнить
-//                .build();
-//    }
-//
-//    private static PageNotificationsDto getPageNotificationsDto(Pageable page, Page<Notification> pageNotifications, NotificationsDto[] content, PageableObject pageableObject) {
-//        return PageNotificationsDto.builder()
-//                .totalPages(1000)          // Уточнить
-//                .totalElements((int) pageNotifications.get().count())  // Уточнить
-//                .number(page.getPage())  // Уточнить
-//                .size(page.getSize())  // Уточнить
-//                .content(content)
-//                .sort(null)  // Уточнить
-//                .first(true)  // Уточнить
-//                .last(false)  // Уточнить
-//                .numberOfElements(10000)  // Уточнить
-//                .pageable(pageableObject)
-//                .empty(false)  // Уточнить
-//                .build();
-//    }
 
     @Override
     public PageNotificationsDto getNotifications(Integer page, Integer size, String sort) {
@@ -319,31 +157,28 @@ import java.util.stream.Collectors;
         spec = spec.and(NotificationsSpecifications.isReaded(false));
 
         Pageable pageable = PageRequest.of(page, size, sortObj);
-
         Page<NotificationEntity> pageNotifications = notificationRepository.findAll(spec, pageable);
         log.info("Прочитано {} событий", pageNotifications.get().count());
-
         NotificationsDto[] content = getNotificationsDtos(pageNotifications);
-
         PageableObject pageableObject = getPageableObject(pageable, sortObj);
 
-        return getPageNotificationsDto(pageable, pageNotifications, content, pageableObject);
+        return getPageNotificationsDto(pageable, pageNotifications, content, pageableObject, sortObj);
 
     }
 
-    private static PageNotificationsDto getPageNotificationsDto(Pageable page, Page<NotificationEntity> pageNotifications, NotificationsDto[] content, PageableObject pageableObject) {
+    private static PageNotificationsDto getPageNotificationsDto(Pageable page, Page<NotificationEntity> pageNotifications, NotificationsDto[] content, PageableObject pageableObject, Sort sortObj) {
         return PageNotificationsDto.builder()
-                .totalPages(1000)          // Уточнить
-                .totalElements((int) pageNotifications.get().count())  // Уточнить
-                .number(page.getPageNumber())  // Уточнить
-                .size(page.getPageSize())  // Уточнить
+                .totalPages(pageNotifications.getTotalPages())
+                .totalElements((int) pageNotifications.get().count())
+                .number(page.getPageNumber())
+                .size(page.getPageSize())
                 .content(content)
-                .sort(null)  // Уточнить
-                .first(true)  // Уточнить
-                .last(false)  // Уточнить
-                .numberOfElements(10000)  // Уточнить
+                .sort(new SortDto(sortObj.isEmpty(), sortObj.isUnsorted(), sortObj.isSorted()))
+                .first(pageNotifications.isFirst())
+                .last(pageNotifications.isLast())
+                .numberOfElements(pageNotifications.getNumberOfElements())
                 .pageable(pageableObject)
-                .empty(false)  // Уточнить
+                .empty(pageNotifications.isEmpty())
                 .build();
     }
 
@@ -354,7 +189,7 @@ import java.util.stream.Collectors;
                 .empty(sort.isEmpty())
                 .build();
 
-        PageableObject pageableObject = PageableObject.builder()
+        return PageableObject.builder()
                 .sortDto(sortDTO)
                 .unpaged(pageable.isUnpaged())
                 .paged(pageable.isPaged())
@@ -362,8 +197,6 @@ import java.util.stream.Collectors;
                 .pageNumber(pageable.getPageNumber())
                 .offset((int) pageable.getOffset())
                 .build();
-
-        return pageableObject;
     }
 
     private static NotificationsDto[] getNotificationsDtos(Page<NotificationEntity> pageNotifications) {
@@ -390,110 +223,21 @@ import java.util.stream.Collectors;
         return content;
     }
 
+    @Override
+    public NotificationCountDto getEventsCount() {
+        UserModel user = getCurrentUser();
+        log.info("Counting events for user: {}", user.getId());
 
-
-
-
-//    @Override
-//    public Page<NotificationsDto> getNotifications(Integer page, Integer size, String sort) {
-//        UserModel user = getCurrentUser();
-////        logger.log(Level.INFO, "get Notification");
-//        log.info("get Notification");
-//
-//        String[] sortParts = sort.split(",");
-//        String field = sortParts[0];
-//        String direction = sortParts[1];
-//
-//        Sort sortObj = Sort.by("desc".equalsIgnoreCase(direction) ? Sort.Order.desc(field) : Sort.Order.asc(field));
-//
-//        Specification<NotificationEntity> spec = Specification.where(NotificationsSpecifications.byReceiverId(user.getId()));
-//        spec = spec.and(NotificationsSpecifications.isReaded(false));
-//
-//        Pageable pageable = PageRequest.of(page, size, sortObj);
-//
-//        Page<NotificationEntity> notificationPage = notificationRepository.findAll(spec, pageable);
-//
-//
-//        List<NotificationsDto> content = notificationPage.getContent().stream()
-//                .map(notification -> new NotificationsDto(
-//                        notification.getSentTime(),
-//                        new EventNotificationDto(
-//                                notification.getAuthorId(),
-//                                notification.getReceiverId(),
-//                                notification.getNotificationType(),
-//                                notification.getContent()
-//                        )
-//                ))
-//                .collect(Collectors.toList());
-//
-//
-//        return new PageImpl<>(content, pageable, notificationPage.getTotalElements());
-//    }
-
-
-//    @Override
-//    public Page<NotificationEntity> getNotifications(Integer page, Integer size, String sort) {
-//        logger.log(Level.INFO, "Getting notifications for page: {}, size: {}, sort: {}", page, size, sort);
-//        UserModel user = getCurrentUser();
-//        logger.log(Level.INFO, "Fetching notifications for user: {}", user.getId());
-//
-//        String[] sortParts = sort.split(",");
-//        String field = sortParts[0];
-//        String direction = sortParts[1];
-//
-//        Sort sortObj = Sort.by("desc".equalsIgnoreCase(direction) ? Sort.Order.desc(field) : Sort.Order.asc(field));
-//
-//        Specification<NotificationEntity> spec = Specification.where(NotificationsSpecifications.byReceiverId(user.getId()));
-//        Pageable pageable = PageRequest.of(page, size, sortObj);
-//
-//        return notificationRepository.findAll(spec, pageable);
-//    }
-
-
-
-//        @Override
-//        public Page<NotificationEntity> getNotifications(Integer page, Integer size, String sort) {
-//            logger.log(Level.INFO, "Getting notifications for page: {}, size: {}, sort: {}", page, size, sort);
-//            UserModel user = getCurrentUser();
-//            logger.log(Level.INFO, "Fetching notifications for user: {}", user.getId());
-//
-//            //old code
-////            Sort sortObj = Sort.by(Sort.Order.desc("sentTime"));
-////            if (sort != null && !sort.isEmpty()) {
-////                sortObj = Sort.by(sort.stream()
-////                        .map(s -> s.startsWith("-") ? Sort.Order.desc(s.substring(1)) : Sort.Order.asc(s))
-////                        .toArray(Sort.Order[]::new));
-////            }
-//
-//            String[] sortParts = sort.split(",");
-//            String field = sortParts[0];
-//            String direction = sortParts[1];
-//
-//            Sort sortObj = Sort.by("desc".equalsIgnoreCase(direction) ? Sort.Order.desc(field) : Sort.Order.asc(field));
-//
-//            Specification<NotificationEntity> spec = Specification.where(NotificationsSpecifications.byReceiverId(user.getId()));
-//            Pageable pageable = PageRequest.of(page, size, sortObj);
-//
-//            return notificationRepository.findAll(spec, pageable);
-//        }
-
-        @Override
-        public NotificationCountDto getEventsCount() {
-            UserModel user = getCurrentUser();
-//            logger.log(Level.INFO, "Counting events for user: {}", user.getId());
-            log.info("Counting events for user: {}", user.getId());
-
-            List<NotificationEntity> notifications = notificationRepository.findByReceiverId(user.getId());
-            if (notifications.isEmpty()) {
-//                logger.log(Level.INFO, "No notifications found for user: {} ", user.getId());
-                log.info("No notifications found for user: {} ", user.getId());
-            }
-
-            long unreadCount = notifications.stream()
-                    .filter(notification -> !notification.getIsReaded())
-                    .count();
-
-            Count count = new Count((int) unreadCount);
-            return new NotificationCountDto(LocalDateTime.now(), count);
+        List<NotificationEntity> notifications = notificationRepository.findByReceiverId(user.getId());
+        if (notifications.isEmpty()) {
+            log.info("No notifications found for user: {} ", user.getId());
         }
+
+        long unreadCount = notifications.stream()
+                .filter(notification -> !notification.getIsReaded())
+                .count();
+
+        Count count = new Count((int) unreadCount);
+        return new NotificationCountDto(LocalDateTime.now(), count);
     }
+}

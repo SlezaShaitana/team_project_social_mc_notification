@@ -10,6 +10,4 @@ import java.util.UUID;
 @Repository
 public interface NotificationSettingRepository extends JpaRepository<NotificationSettingEntity, UUID> {
     NotificationSettingEntity findByUserId(UUID userId);
-
-
 }

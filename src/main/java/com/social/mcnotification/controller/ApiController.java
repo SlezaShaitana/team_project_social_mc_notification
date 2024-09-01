@@ -2,19 +2,13 @@ package com.social.mcnotification.controller;
 
 import com.social.mcnotification.dto.*;
 import com.social.mcnotification.dto.response.PageNotificationsDto;
-import com.social.mcnotification.model.NotificationEntity;
 import com.social.mcnotification.services.NotificationService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.web.PagedModel;
-import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 
@@ -28,7 +22,6 @@ public class ApiController {
 
     @GetMapping("/settings")
     @PreAuthorize("isAuthenticated()")
-//    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')")
     public ResponseEntity<NotificationSettingDto> getNotificationSettings() {
         return ResponseEntity.ok(notificationService.getNotificationSettings());
     }
@@ -44,7 +37,6 @@ public class ApiController {
 
     @PutMapping("/readed")
     @PreAuthorize("isAuthenticated()")
-//    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')")
     public ResponseEntity<String> markAllEventsAsRead() {
         notificationService.markAllEventsAsRead();
         return new ResponseEntity<>(HttpStatus.OK);
@@ -57,18 +49,15 @@ public class ApiController {
     }
 
     @PostMapping("/add")
-//    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> createNotification(@RequestBody EventNotificationDto eventNotificationDto) {
         notificationService.createNotification(eventNotificationDto);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-
-
     @GetMapping("/page")
     public ResponseEntity<PageNotificationsDto> getNotifications(@RequestParam(name = "page", defaultValue = "0") Integer page,
-                                                 @RequestParam(name = "size", defaultValue = "10") Integer size,
-                                                 @RequestParam(name = "sort", required = false) String sort) {
+                                                                 @RequestParam(name = "size", defaultValue = "10") Integer size,
+                                                                 @RequestParam(name = "sort", required = false) String sort) {
 
         if (page < 0) {
             page = 0;
@@ -79,47 +68,6 @@ public class ApiController {
 
         return ResponseEntity.ok(notificationService.getNotifications(page, size, sort));
     }
-
-
-
-
-
-
-
-
-//    @GetMapping("/notifications")
-//    public ResponseEntity<Page<NotificationsDto>> getNotifications(@RequestParam(name = "page", defaultValue = "0") Integer page,
-//                                                                   @RequestParam(name = "size", defaultValue = "10") Integer size,
-//                                                                   @RequestParam(name = "sort", required = false) String sort) {
-//
-//
-//        if (page < 0) {
-//            page = 0;
-//        }
-//        if (size < 1) {
-//            size = 1;
-//        }
-//
-//        return ResponseEntity.ok(notificationService.getNotifications(page, size, sort));
-//    }
-
-
-//    @GetMapping("/page")
-//    @PreAuthorize("isAuthenticated()")
-//    public ResponseEntity<Page<NotificationDto>> getNotifications(@RequestParam(name = "page", defaultValue = "0") Integer page,
-//                                                                  @RequestParam(name = "size", defaultValue = "10") Integer size,
-//                                                                  @RequestParam(name = "sort", required = false) String sort) {
-//        if (page < 0) {
-//            page = 0;
-//        }
-//        if (size < 1) {
-//            size = 1;
-//        }
-//        return ResponseEntity.ok(notificationService.getNotifications(page, size, sort).map(
-//                n -> new NotificationDto(n)
-//        ));
-//    }
-
 
     @GetMapping("/count")
     @PreAuthorize("isAuthenticated()")

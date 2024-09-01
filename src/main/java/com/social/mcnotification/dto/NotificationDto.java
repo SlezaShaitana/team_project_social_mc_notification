@@ -6,7 +6,6 @@ import com.social.mcnotification.model.NotificationEntity;
 import lombok.*;
 
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -25,30 +24,11 @@ public class NotificationDto {
     private UUID eventId;
     private Boolean isReaded;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     public NotificationDto(NotificationEntity notificationEntity) {
         this.id = notificationEntity.getId();
         this.authorId = notificationEntity.getAuthorId();
         this.content = notificationEntity.getContent();
         this.notificationType = notificationEntity.getNotificationType();
-//        this.sentTime = notificationEntity.getSentTime().toLocalDateTime();
         this.sentTime = notificationEntity.getSentTime();
         this.receiverId = notificationEntity.getReceiverId();
         this.serviceName = notificationEntity.getServiceName();

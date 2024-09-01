@@ -15,7 +15,7 @@ public class PageFriendShortDto {
     private boolean first;
     private boolean last;
     private int numberOfElements;
-//    private PageableObject pageable;
+    //    private PageableObject pageable;
     private boolean empty;
 
 }

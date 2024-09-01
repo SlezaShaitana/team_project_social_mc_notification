@@ -33,13 +33,7 @@ public class TimeProvider implements CommandLineRunner {
         Logger.getLogger(TimeProvider.class.getName()).info(" running " + appName
                 + " with profile " + providerProperties.getProfile());
         Logger.getLogger(TimeProvider.class.getName()).info(welcomeMessage);
-
         this.timeService.PrintCurrentTime();
-
-
-//        log.info("current time " + dateFormat.format(new Date()));
-//        log.info("running " + appName + " with profile " + providerProperties.getProfile());
-//        log.info(welcomeMessage);
 
     }
 }

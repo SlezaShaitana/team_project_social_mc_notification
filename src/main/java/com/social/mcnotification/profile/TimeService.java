@@ -17,7 +17,6 @@ public class TimeService {
     }
 
     public void PrintCurrentTime() {
-        //  искать формат в гугле в оракле набрав в поисковике SimpleDateFormat patterns
         SimpleDateFormat dateFormat = new SimpleDateFormat(providerProperties.getFormat());
         Logger.getLogger(TimeProvider.class.getName()).info(providerProperties.getDescription());
         Logger.getLogger(TimeProvider.class.getName()).info("current time " + dateFormat.format(new Date()));

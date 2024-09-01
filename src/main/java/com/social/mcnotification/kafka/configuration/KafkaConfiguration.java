@@ -23,7 +23,6 @@ import java.util.Map;
 
 @Configuration
 @Slf4j
-//@EnableKafka // ??
 public class KafkaConfiguration {
 
     //notification
@@ -36,7 +35,27 @@ public class KafkaConfiguration {
     @Value("${spring.kafka.kafkaMessageGroupIdAuth}")
     private String kafkaMassageGroupIdAuth;
 
-    //notification
+    @Bean
+    public ConsumerFactory<String, RegistrationDto> authKafkaMessageConsumerFactory(ObjectMapper objectMapper) {
+        Map<String, Object> config = new HashMap<>();
+        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootStrapServers);
+        config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+        config.put(ConsumerConfig.GROUP_ID_CONFIG, kafkaMassageGroupIdAuth);
+        config.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
+
+        return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(), new JsonDeserializer<>(objectMapper));
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, RegistrationDto> authKafkaMessageConcurrentKafkaListenerContainerFactory(
+            ConsumerFactory<String, RegistrationDto> kafkaMessageConsumerFactory
+    ) {
+        ConcurrentKafkaListenerContainerFactory<String, RegistrationDto> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(kafkaMessageConsumerFactory);
+
+        return factory;
+    }
 
     @Bean
     public ConsumerFactory<String, NotificationDto> kafkaMessageConsumerFactory(ObjectMapper objectMapper) {
@@ -50,12 +69,15 @@ public class KafkaConfiguration {
         return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(), new JsonDeserializer<>(objectMapper));
     }
 
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, NotificationDto> kafkaMessageConcurrentKafkaListenerContainerFactory(
+            ConsumerFactory<String, NotificationDto> kafkaMessageConsumerFactory
+    ) {
+        ConcurrentKafkaListenerContainerFactory<String, NotificationDto> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(kafkaMessageConsumerFactory);
 
-
-
-
-
-
+        return factory;
+    }
 
 
 //    @Bean
@@ -77,15 +99,7 @@ public class KafkaConfiguration {
 //    }
 //
 //
-    @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, NotificationDto> kafkaMessageConcurrentKafkaListenerContainerFactory(
-            ConsumerFactory<String, NotificationDto> kafkaMessageConsumerFactory
-    ) {
-        ConcurrentKafkaListenerContainerFactory<String, NotificationDto> factory = new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(kafkaMessageConsumerFactory);
 
-        return factory;
-    }
 //
 //
 //
@@ -111,60 +125,6 @@ public class KafkaConfiguration {
 //
 //        return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(), errorHandlingDeserializer);
 //    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    //auth
-    @Bean
-    public ConsumerFactory<String, RegistrationDto> authKafkaMessageConsumerFactory(ObjectMapper objectMapper) {
-        Map<String, Object> config = new HashMap<>();
-        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootStrapServers);
-        config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
-        config.put(ConsumerConfig.GROUP_ID_CONFIG, kafkaMassageGroupIdAuth);
-        config.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
-
-        return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(), new JsonDeserializer<>(objectMapper));
-    }
-
-    @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, RegistrationDto> authKafkaMessageConcurrentKafkaListenerContainerFactory(
-            ConsumerFactory<String, RegistrationDto> kafkaMessageConsumerFactory
-    ) {
-        ConcurrentKafkaListenerContainerFactory<String, RegistrationDto> factory = new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(kafkaMessageConsumerFactory);
-
-        return factory;
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 //    @Bean

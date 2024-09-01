@@ -15,8 +15,6 @@ public class NotificationSettingEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", columnDefinition = "uuid", nullable = false)
     private UUID id;
-
-
     @Column(name = "user_id")
     private UUID userId;
     @Column(name = "enable_like")

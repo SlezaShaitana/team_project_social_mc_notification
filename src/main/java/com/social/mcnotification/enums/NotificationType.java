@@ -1,7 +1,7 @@
 package com.social.mcnotification.enums;
 
 public enum NotificationType {
-//    LIKE,
+    //    LIKE,
     LIKE_POST,
     LIKE_COMMENT,
     POST,

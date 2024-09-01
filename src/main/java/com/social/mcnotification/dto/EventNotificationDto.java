@@ -24,8 +24,6 @@ public class EventNotificationDto {
         this.notificationType = notificationEntity.getNotificationType();
         this.content = notificationEntity.getContent();
 
-//        this.sentTime = notificationEntity.getSentTime().toLocalDateTime();
-
     }
 
 }

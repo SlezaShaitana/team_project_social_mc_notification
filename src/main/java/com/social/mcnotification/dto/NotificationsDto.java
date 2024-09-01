@@ -6,16 +6,12 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.List;
 
 @AllArgsConstructor
 @Getter
 @Setter
 @NoArgsConstructor
 public class NotificationsDto {
-    private Timestamp timeStamp; //TimeStamp
-        private NotificationDto data; // // private List<NotificationDto> data;
-//    private EventNotificationDto data;
-
+    private Timestamp timeStamp;
+    private NotificationDto data;
 }

@@ -52,8 +52,8 @@ public class KafkaMessageService {
         switch (notificationDto.getServiceName()) {
             case POST -> setNotificationMessageForPostMicroservice(type, notificationDto, nameAuthor);
             case DIALOG -> setNotificationMessageForDialogMicroservice(notificationDto, nameAuthor);
-            case FRIENDS -> setNotificationMessageForFriendMicroservice(type, notificationDto, nameAuthor );
-            case ACCOUNT -> setNotificationMessageForAccountMicroservice(notificationDto, nameAuthor );
+            case FRIENDS -> setNotificationMessageForFriendMicroservice(type, notificationDto, nameAuthor);
+            case ACCOUNT -> setNotificationMessageForAccountMicroservice(notificationDto, nameAuthor);
         }
 
     }
@@ -71,7 +71,7 @@ public class KafkaMessageService {
                 for (UUID uuid : listFriendsId) {
                     notificationDto.setReceiverId(uuid);
                     if (notificationDto.getNotificationType() == NotificationType.FRIEND_BIRTHDAY) {
-                        notificationDto.setContent("Сегодня день рождения у вашего друга "  + nameAuthor +  "Не забудьте поздравить!");
+                        notificationDto.setContent("Сегодня день рождения у вашего друга " + nameAuthor + "Не забудьте поздравить!");
                     }
                     if (notificationDto.getNotificationType() == NotificationType.POST) {
                         notificationDto.setContent("Пользователь " + nameAuthor + " написал новый пост");
@@ -93,11 +93,11 @@ public class KafkaMessageService {
 
         } else if (type == NotificationType.LIKE_COMMENT) {
             // получит только автор комментария
-            notificationDto.setContent("Пользователь " + nameAuthor +" поставил лайк к комментарию");
+            notificationDto.setContent("Пользователь " + nameAuthor + " поставил лайк к комментарию");
 
         } else if (type == NotificationType.POST_COMMENT) {
             // получит только автор поста
-            notificationDto.setContent("Пользователь " + nameAuthor +" оставил комментарий под постом");
+            notificationDto.setContent("Пользователь " + nameAuthor + " оставил комментарий под постом");
 
         } else if (type == NotificationType.COMMENT_COMMENT) {
             // получит только автор комментария
@@ -138,8 +138,6 @@ public class KafkaMessageService {
         //зарегестророван новый пользователь
         //NEW_USER_REGISTRATION
 //        notificationRepository.save(mapper.mapToNotificationEntity(notificationDto));
-
-
     }
 
 

@@ -25,7 +25,7 @@ public class NotificationProducer {
     @Value("${spring.kafka.bootstrap-servers}")
     private String bootStrapServers;
 
-        @Bean
+    @Bean
     public ProducerFactory<String, NotificationDto> kafkaMessageProducerFactory(ObjectMapper objectMapper) {
         Map<String, Object> config = new HashMap<>();
         config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootStrapServers);

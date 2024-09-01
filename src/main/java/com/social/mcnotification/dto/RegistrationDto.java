@@ -14,7 +14,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Data
 public class RegistrationDto {
-    private UUID uuid=UUID.randomUUID();
+    private UUID uuid = UUID.randomUUID();
     private boolean deleted;
     private String email;
     private String password1;

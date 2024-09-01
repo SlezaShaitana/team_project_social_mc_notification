@@ -37,6 +37,4 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         log.error("Application specific error handling", e);
         return new ResponseEntity<>(new ErrorMessages(e.getMessage()), HttpStatus.BAD_REQUEST);
     }
-
-
 }

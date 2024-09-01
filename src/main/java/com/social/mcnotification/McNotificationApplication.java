@@ -13,8 +13,8 @@ import org.springframework.context.annotation.PropertySource;
 @EnableConfigurationProperties(ProviderProperties.class)
 public class McNotificationApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(McNotificationApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(McNotificationApplication.class, args);
+    }
 
 }
