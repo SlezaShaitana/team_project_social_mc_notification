@@ -1,5 +1,7 @@
 package com.social.mcnotification.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.social.mcnotification.enums.MicroServiceName;
 import com.social.mcnotification.enums.NotificationType;
 import com.social.mcnotification.model.NotificationEntity;
@@ -13,15 +15,23 @@ import java.util.UUID;
 @Getter
 @Setter
 @Builder
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class NotificationDto {
+    @JsonProperty("id")
     private UUID id;
     private UUID authorId;
+    @JsonProperty("content")
     private String content;
     private NotificationType notificationType;
+    @JsonProperty("sentTime")
     private Timestamp sentTime; //Timestamp
+    @JsonProperty("receiverId")
     private UUID receiverId;
+    @JsonProperty("serviceName")
     private MicroServiceName serviceName;
+    @JsonProperty("eventId")
     private UUID eventId;
+    @JsonProperty("isReaded")
     private Boolean isReaded;
 
     public NotificationDto(NotificationEntity notificationEntity) {
