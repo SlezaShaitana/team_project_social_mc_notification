@@ -1,6 +1,7 @@
 package com.social.mcnotification.controller;
 
 import com.social.mcnotification.dto.*;
+import com.social.mcnotification.dto.response.PageNotificationsDto;
 import com.social.mcnotification.model.NotificationEntity;
 import com.social.mcnotification.services.NotificationService;
 import lombok.RequiredArgsConstructor;
@@ -64,29 +65,10 @@ public class ApiController {
 
 
 
-
-
-//
-//    @GetMapping("/page")
-//    @PreAuthorize("isAuthenticated()")
-//    public ResponseEntity<Page<NotificationsDto>> getNotifications(@RequestParam(name = "page", defaultValue = "0") Integer page,
-//                                                                      @RequestParam(name = "size", defaultValue = "10") Integer size,
-//                                                                      @RequestParam(name = "sort", required = false) List<String> sort) {
-//        if (page < 0) {
-//            page = 0;
-//        }
-//        if (size < 1) {
-//            size = 1;
-//        }
-//        return ResponseEntity.ok(notificationService.getNotifications(page, size, sort));
-//    }
-
-
-    @GetMapping("/notifications")
-    public ResponseEntity<Page<NotificationsDto>> getNotifications(@RequestParam(name = "page", defaultValue = "0") Integer page,
-                                                                   @RequestParam(name = "size", defaultValue = "10") Integer size,
-                                                                   @RequestParam(name = "sort", required = false) String sort) {
-
+    @GetMapping("/page")
+    public PageNotificationsDto getNotifications(@RequestParam(name = "page", defaultValue = "0") Integer page,
+                                                 @RequestParam(name = "size", defaultValue = "10") Integer size,
+                                                 @RequestParam(name = "sort", required = false) String sort) {
 
         if (page < 0) {
             page = 0;
@@ -97,6 +79,29 @@ public class ApiController {
 
         return ResponseEntity.ok(notificationService.getNotifications(page, size, sort));
     }
+
+
+
+
+
+
+
+
+//    @GetMapping("/notifications")
+//    public ResponseEntity<Page<NotificationsDto>> getNotifications(@RequestParam(name = "page", defaultValue = "0") Integer page,
+//                                                                   @RequestParam(name = "size", defaultValue = "10") Integer size,
+//                                                                   @RequestParam(name = "sort", required = false) String sort) {
+//
+//
+//        if (page < 0) {
+//            page = 0;
+//        }
+//        if (size < 1) {
+//            size = 1;
+//        }
+//
+//        return ResponseEntity.ok(notificationService.getNotifications(page, size, sort));
+//    }
 
 
 //    @GetMapping("/page")

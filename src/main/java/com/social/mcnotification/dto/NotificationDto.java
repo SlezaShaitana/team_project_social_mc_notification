@@ -3,10 +3,7 @@ package com.social.mcnotification.dto;
 import com.social.mcnotification.enums.MicroServiceName;
 import com.social.mcnotification.enums.NotificationType;
 import com.social.mcnotification.model.NotificationEntity;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -16,6 +13,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Getter
 @Setter
+@Builder
 public class NotificationDto {
     private UUID id;
     private UUID authorId;
