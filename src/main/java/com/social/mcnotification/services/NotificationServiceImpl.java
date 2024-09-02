@@ -144,36 +144,6 @@ public class NotificationServiceImpl implements NotificationService {
         }
     }
 
-    public List<NotificationType> getDisabledNotificationTypes(UserModel user) {
-        NotificationSettingDto setting = mapper.mapToNotificationSettingDto(notificationSettingRepository.findByUserId(user.getId()));
-
-        List<NotificationType> disabledTypes = new ArrayList<>();
-
-        if (!setting.isEnablePost()) {
-            disabledTypes.add(NotificationType.POST);
-        }
-        if (!setting.isEnablePostComment()) {
-            disabledTypes.add(NotificationType.POST_COMMENT);
-        }
-        if (!setting.isEnableCommentComment()) {
-            disabledTypes.add(NotificationType.COMMENT_COMMENT);
-        }
-        if (!setting.isEnableFriendRequest()) {
-            disabledTypes.add(NotificationType.FRIEND_REQUEST);
-        }
-        if (!setting.isEnableMessage()) {
-            disabledTypes.add(NotificationType.MESSAGE);
-        }
-        if (!setting.isEnableFriendBirthday()) {
-            disabledTypes.add(NotificationType.FRIEND_BIRTHDAY);
-        }
-        if (!setting.isEnableSendEmailMessage()) {
-            disabledTypes.add(NotificationType.SEND_EMAIL_MESSAGE);
-        }
-
-        return disabledTypes;
-    }
-
 
     @Override
     public PageNotificationsDto getNotifications(Integer page, Integer size, String sort) {
@@ -186,12 +156,6 @@ public class NotificationServiceImpl implements NotificationService {
 
         Specification<NotificationEntity> spec = Specification.where(NotificationsSpecifications.byReceiverId(user.getId()));
         spec = spec.and(NotificationsSpecifications.isReaded(false));
-
-        List<NotificationType> disableTypes = getDisabledNotificationTypes(user);
-
-        if (!disableTypes.isEmpty()) {
-            spec = spec.and(NotificationsSpecifications.notByNotificationTypes(disableTypes));
-        }
 
         Pageable pageable = PageRequest.of(page, size, sortObj);
         Page<NotificationEntity> pageNotifications = notificationRepository.findAll(spec, pageable);
