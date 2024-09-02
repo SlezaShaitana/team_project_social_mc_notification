@@ -10,12 +10,19 @@ import jakarta.persistence.criteria.Root;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 
 public class NotificationsSpecifications {
 
     // * добавить поддержку спецификаций JpaSpecificationExecutor в репозиторий NotificationRepository
+
+
+
+    public static Specification<NotificationEntity> notByNotificationTypes(List<NotificationType> types) {
+        return (root, query, criteriaBuilder) -> criteriaBuilder.not(root.get("type").in(types));
+    }
 
     public static Specification<NotificationEntity> byNotificationType(NotificationType notificationType) {
         return (Specification<NotificationEntity>) (root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(root.get("type"), notificationType);

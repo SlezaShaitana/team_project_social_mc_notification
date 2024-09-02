@@ -144,6 +144,36 @@ public class NotificationServiceImpl implements NotificationService {
         }
     }
 
+    public List<NotificationType> getDisabledNotificationTypes(UserModel user) {
+        NotificationSettingDto setting = mapper.mapToNotificationSettingDto(notificationSettingRepository.findByUserId(user.getId()));
+
+        List<NotificationType> disabledTypes = new ArrayList<>();
+
+        if (!setting.isEnablePost()) {
+            disabledTypes.add(NotificationType.POST);
+        }
+        if (!setting.isEnablePostComment()) {
+            disabledTypes.add(NotificationType.POST_COMMENT);
+        }
+        if (!setting.isEnableCommentComment()) {
+            disabledTypes.add(NotificationType.COMMENT_COMMENT);
+        }
+        if (!setting.isEnableFriendRequest()) {
+            disabledTypes.add(NotificationType.FRIEND_REQUEST);
+        }
+        if (!setting.isEnableMessage()) {
+            disabledTypes.add(NotificationType.MESSAGE);
+        }
+        if (!setting.isEnableFriendBirthday()) {
+            disabledTypes.add(NotificationType.FRIEND_BIRTHDAY);
+        }
+        if (!setting.isEnableSendEmailMessage()) {
+            disabledTypes.add(NotificationType.SEND_EMAIL_MESSAGE);
+        }
+
+        return disabledTypes;
+    }
+
 
     @Override
     public PageNotificationsDto getNotifications(Integer page, Integer size, String sort) {
@@ -154,45 +184,13 @@ public class NotificationServiceImpl implements NotificationService {
         String direction = sortParts[1];
         Sort sortObj = Sort.by("desc".equalsIgnoreCase(direction) ? Sort.Order.desc(field) : Sort.Order.asc(field));
 
-        NotificationSettingDto setting = mapper.mapToNotificationSettingDto(notificationSettingRepository.findByUserId(user.getId()));
-
         Specification<NotificationEntity> spec = Specification.where(NotificationsSpecifications.byReceiverId(user.getId()));
         spec = spec.and(NotificationsSpecifications.isReaded(false));
 
-        // О новых публикациях
-        if (setting.isEnablePost()) {
-            spec = spec.and(NotificationsSpecifications.byNotificationType(NotificationType.POST));
-        }
+        List<NotificationType> disableTypes = getDisabledNotificationTypes(user);
 
-        //О новых комментариях к моим публикациям
-        if (setting.isEnablePostComment()) {
-            spec = spec.and(NotificationsSpecifications.byNotificationType(NotificationType.POST_COMMENT));
-        }
-
-        //О ответах на мои комментарии
-        if (setting.isEnableCommentComment() ) {
-            spec = spec.and(NotificationsSpecifications.byNotificationType(NotificationType.COMMENT_COMMENT));
-        }
-
-        //О заявках в друзья
-        if (setting.isEnableFriendRequest()) {
-            spec = spec.and(NotificationsSpecifications.byNotificationType(NotificationType.FRIEND_REQUEST));
-        }
-
-        //О новых личных сообщениях
-        if (setting.isEnableMessage()) {
-            spec = spec.and(NotificationsSpecifications.byNotificationType(NotificationType.MESSAGE));
-        }
-
-        //О дне рождения друга
-        if (setting.isEnableFriendBirthday()) {
-            spec = spec.and(NotificationsSpecifications.byNotificationType(NotificationType.FRIEND_BIRTHDAY));
-        }
-
-
-        // Отправлять уведомления на e-mail
-        if (setting.isEnableSendEmailMessage()) {
-            spec = spec.and(NotificationsSpecifications.byNotificationType(NotificationType.SEND_EMAIL_MESSAGE));
+        if (!disableTypes.isEmpty()) {
+            spec = spec.and(NotificationsSpecifications.notByNotificationTypes(disableTypes));
         }
 
         Pageable pageable = PageRequest.of(page, size, sortObj);
