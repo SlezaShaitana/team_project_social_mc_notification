@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.UUID;
 
 //@FeignClient(name = "mc-friend", url = "${friend.service.url}" + "/api/v1/friends") //
-@FeignClient(name = "mc-friend", url = "http://79.174.80.200:8090/api/v1/friends")
+@FeignClient(name = "mc-friend", url = "http://79.174.80.200:8090/api/v1/friends", configuration = FeignClientConfiguration.class)
 public interface FriendClient {
 
 //    @GetMapping
