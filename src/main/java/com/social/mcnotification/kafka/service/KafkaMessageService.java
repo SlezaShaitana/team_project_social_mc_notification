@@ -141,11 +141,15 @@ public class KafkaMessageService {
         messages.add(notificationDto);
     }
 
-    public static boolean findById(List<NotificationSettingDto> settingsDtoList, UUID id) {
-        Optional<NotificationSettingDto> settingOptional = settingsDtoList.stream()
-                .filter(setting -> setting.getId().equals(id))
-                .findFirst();
+//    public boolean findById(List<NotificationSettingDto> settingsDtoList, UUID id) {
+//        Optional<NotificationSettingDto> settingOptional = settingsDtoList.stream()
+//                .filter(setting -> setting.getId().equals(id))
+//                .findFirst();
+//
+//        return settingOptional.isPresent();
+//    }
 
-        return settingOptional.isPresent();
+    public Optional<NotificationDto> findById(UUID id) {
+        return messages.stream().filter(not -> not.getId().equals(id)).findFirst();
     }
 }
