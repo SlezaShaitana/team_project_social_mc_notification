@@ -72,9 +72,9 @@ public class NotificationServiceImpl implements NotificationService {
 
         if (settingEntity == null) {
             log.error("Notification settings not found for user: {} ", user.getId());
-            throw new NotificationSettingNotFoundException("Notification settings not found for user");
-//            settingEntity = new NotificationSettingEntity();
-//            settingEntity.setUserId(getCurrentUser().getId());
+//            throw new NotificationSettingNotFoundException("Notification settings not found for user");
+            settingEntity = new NotificationSettingEntity();
+            settingEntity.setUserId(getCurrentUser().getId());
         }
 
         Boolean setting = notificationUpdateDto.getEnable();
