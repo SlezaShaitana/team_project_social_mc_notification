@@ -28,16 +28,16 @@ public class NotificationConsumer {
 
     }
 
-    @KafkaListener(topics = "${spring.kafka.kafkaMessageTopicAuth}", groupId = "${spring.kafka.kafkaMessageGroupId}", containerFactory = "authKafkaMessageConcurrentKafkaListenerContainerFactory")
-    public void listenAuth(@Payload RegistrationDto registrationDto) {
-        log.info("Received notification: {}", registrationDto);
-
-        try {
-            kafkaMessageService.setNotificationMessageForAuthMicroservice(registrationDto);
-            log.info("Notification successfully saved: {}", registrationDto);
-        } catch (Exception e) {
-            log.error("Error saving notification: {}", registrationDto, e);
-        }
-
-    }
+//    @KafkaListener(topics = "${spring.kafka.kafkaMessageTopicAuth}", groupId = "${spring.kafka.kafkaMessageGroupId}", containerFactory = "authKafkaMessageConcurrentKafkaListenerContainerFactory")
+//    public void listenAuth(@Payload RegistrationDto registrationDto) {
+//        log.info("Received notification: {}", registrationDto);
+//
+//        try {
+//            kafkaMessageService.setNotificationMessageForAuthMicroservice(registrationDto);
+//            log.info("Notification successfully saved: {}", registrationDto);
+//        } catch (Exception e) {
+//            log.error("Error saving notification: {}", registrationDto, e);
+//        }
+//
+//    }
 }
