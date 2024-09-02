@@ -3,6 +3,7 @@ package com.social.mcnotification.services;
 import com.social.mcnotification.dto.*;
 import com.social.mcnotification.dto.response.PageNotificationsDto;
 import com.social.mcnotification.dto.response.PageableObject;
+import com.social.mcnotification.enums.NotificationType;
 import com.social.mcnotification.exceptions.InvalidNotificationTypeException;
 import com.social.mcnotification.exceptions.NotificationSettingNotFoundException;
 import com.social.mcnotification.model.NotificationEntity;
@@ -153,8 +154,46 @@ public class NotificationServiceImpl implements NotificationService {
         String direction = sortParts[1];
         Sort sortObj = Sort.by("desc".equalsIgnoreCase(direction) ? Sort.Order.desc(field) : Sort.Order.asc(field));
 
+        NotificationSettingDto setting = mapper.mapToNotificationSettingDto(notificationSettingRepository.findByUserId(user.getId()));
+
         Specification<NotificationEntity> spec = Specification.where(NotificationsSpecifications.byReceiverId(user.getId()));
         spec = spec.and(NotificationsSpecifications.isReaded(false));
+
+        // О новых публикациях
+        if (setting.isEnablePost()) {
+            spec = spec.and(NotificationsSpecifications.byNotificationType(NotificationType.POST));
+        }
+
+        //О новых комментариях к моим публикациям
+        if (setting.isEnablePostComment()) {
+            spec = spec.and(NotificationsSpecifications.byNotificationType(NotificationType.POST_COMMENT));
+        }
+
+        //О ответах на мои комментарии
+        if (setting.isEnableCommentComment() ) {
+            spec = spec.and(NotificationsSpecifications.byNotificationType(NotificationType.COMMENT_COMMENT));
+        }
+
+        //О заявках в друзья
+        if (setting.isEnableFriendRequest()) {
+            spec = spec.and(NotificationsSpecifications.byNotificationType(NotificationType.FRIEND_REQUEST));
+        }
+
+        //О новых личных сообщениях
+        if (setting.isEnableMessage()) {
+            spec = spec.and(NotificationsSpecifications.byNotificationType(NotificationType.MESSAGE));
+        }
+
+        //О дне рождения друга
+        if (setting.isEnableFriendBirthday()) {
+            spec = spec.and(NotificationsSpecifications.byNotificationType(NotificationType.FRIEND_BIRTHDAY));
+        }
+
+
+        // Отправлять уведомления на e-mail
+        if (setting.isEnableSendEmailMessage()) {
+            spec = spec.and(NotificationsSpecifications.byNotificationType(NotificationType.SEND_EMAIL_MESSAGE));
+        }
 
         Pageable pageable = PageRequest.of(page, size, sortObj);
         Page<NotificationEntity> pageNotifications = notificationRepository.findAll(spec, pageable);
