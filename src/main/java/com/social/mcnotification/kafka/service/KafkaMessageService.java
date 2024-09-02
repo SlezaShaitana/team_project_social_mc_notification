@@ -4,7 +4,6 @@ import com.social.mcnotification.client.AccountClient;
 import com.social.mcnotification.client.FriendClient;
 import com.social.mcnotification.client.dto.AccountDataDTO;
 import com.social.mcnotification.dto.NotificationDto;
-import com.social.mcnotification.dto.NotificationSettingDto;
 import com.social.mcnotification.dto.RegistrationDto;
 import com.social.mcnotification.enums.MicroServiceName;
 import com.social.mcnotification.enums.NotificationType;
@@ -13,6 +12,9 @@ import com.social.mcnotification.repository.NotificationRepository;
 import com.social.mcnotification.repository.NotificationSettingRepository;
 import com.social.mcnotification.services.helper.Mapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -23,8 +25,10 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class KafkaMessageService {
 
+//    private static final Logger log = LoggerFactory.getLogger(KafkaMessageService.class);
     private Mapper mapper;
     private final NotificationRepository notificationRepository;
     private final NotificationSettingRepository notificationSettingRepository;
@@ -135,7 +139,6 @@ public class KafkaMessageService {
         //NEW_USER_REGISTRATION
 //        notificationRepository.save(mapper.mapToNotificationEntity(notificationDto));
     }
-
 
     public void addToList(NotificationDto notificationDto) {
         messages.add(notificationDto);
