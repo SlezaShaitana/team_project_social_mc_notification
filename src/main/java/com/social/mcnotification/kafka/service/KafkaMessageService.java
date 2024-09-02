@@ -10,12 +10,15 @@ import com.social.mcnotification.enums.NotificationType;
 import com.social.mcnotification.model.NotificationSettingEntity;
 import com.social.mcnotification.repository.NotificationRepository;
 import com.social.mcnotification.repository.NotificationSettingRepository;
+import com.social.mcnotification.security.jwt.UserModel;
 import com.social.mcnotification.services.helper.Mapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -63,8 +66,11 @@ public class KafkaMessageService {
         // FRIEND_BIRTHDAY
         // POST
 
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserModel userModel = (UserModel) authentication.getPrincipal();
+
         if (notificationDto.getReceiverId() == null) {
-            ResponseEntity<List<UUID>> response = friendClient.getFriendsIdListByUserId(notificationDto.getAuthorId());
+            ResponseEntity<List<UUID>> response = friendClient.getFriendsIdListByUserId(userModel.getToken(), notificationDto.getAuthorId());
             List<UUID> listFriendsId = response.getBody();
 
             if (listFriendsId != null) {
