@@ -120,7 +120,9 @@ public class KafkaMessageService {
             shouldBeSaved = true;
         }
         if (shouldBeSaved) {
-            notificationRepository.save(mapper.mapToNotificationEntity(notificationDto));
+            NotificationEntity notification = mapper.mapToNotificationEntity(notificationDto);
+            notification.setIsReaded(false);
+            notificationRepository.save(notification);
         }
 
     }
@@ -138,7 +140,10 @@ public class KafkaMessageService {
         if (userWantsNotification(notificationDto, notificationDto.getNotificationType())) {
 //            notificationDto.setContent("Пользователь " + nameAuthor + " написал вам сообщение");
             // получит только тот кому отправили сообщение
-            notificationRepository.save(mapper.mapToNotificationEntity(notificationDto));
+            NotificationEntity notification = mapper.mapToNotificationEntity(notificationDto);
+            notification.setIsReaded(false);
+
+            notificationRepository.save(notification);
         } else {
             log.info("User does not want to receive notifications of type: {}", notificationDto.getNotificationType());
         }
