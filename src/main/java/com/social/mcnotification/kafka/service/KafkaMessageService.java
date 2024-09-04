@@ -8,6 +8,7 @@ import com.social.mcnotification.dto.NotificationSettingDto;
 import com.social.mcnotification.dto.RegistrationDto;
 import com.social.mcnotification.enums.MicroServiceName;
 import com.social.mcnotification.enums.NotificationType;
+import com.social.mcnotification.model.NotificationEntity;
 import com.social.mcnotification.model.NotificationSettingEntity;
 import com.social.mcnotification.repository.NotificationRepository;
 import com.social.mcnotification.repository.NotificationSettingRepository;
@@ -145,7 +146,10 @@ public class KafkaMessageService {
 
     public void setNotificationMessageForFriendMicroservice(NotificationType type, NotificationDto notificationDto) {
         if (userWantsNotification(notificationDto, type) || type == NotificationType.FRIEND_REQUEST_CONFIRMATION) {
-            notificationRepository.save(mapper.mapToNotificationEntity(notificationDto));
+            NotificationEntity notification = mapper.mapToNotificationEntity(notificationDto);
+            notification.setIsReaded(false);
+
+            notificationRepository.save(notification);
         } else {
             log.info("User does not want to receive notifications of type: {}", type);
         }
