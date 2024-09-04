@@ -68,7 +68,6 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    @Async("taskExecutor")
     public void updateNotificationSettings(NotificationUpdateDto notificationUpdateDto) {
         UserModel user = getCurrentUser();
         log.info("Updating notification settings for user: {}", user.getId());
