@@ -12,6 +12,7 @@ import com.social.mcnotification.model.NotificationSettingEntity;
 import com.social.mcnotification.repository.NotificationRepository;
 import com.social.mcnotification.repository.NotificationSettingRepository;
 import com.social.mcnotification.security.jwt.UserModel;
+import com.social.mcnotification.services.NotificationServiceImpl;
 import com.social.mcnotification.services.helper.Mapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +41,10 @@ public class KafkaMessageService {
     private final AccountClient accountClient;
     private final List<NotificationDto> messages = new ArrayList<>();
 
+    private final NotificationServiceImpl notificationService;
+
     public void savingToNotificationRepository(NotificationDto notificationDto) {
+        log.info("method savingToNotificationRepository");
         //Смотреть откуда пришло
 
         //Пример: пришла из постов
@@ -48,7 +52,7 @@ public class KafkaMessageService {
         //смотришь друзей этого пользователя --> friends
         //сохраняешь в БД столько уведомлений, сколько у пользователя друзей, меняя толкьо receiverId
         NotificationType type = notificationDto.getNotificationType();
-        UserModel userModel = (UserModel) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        UserModel userModel = notificationService.getCurrentUser();
         log.info("id {} token {} email {}", userModel.getId(), userModel.getToken(), userModel.getEmail());
 
         AccountDataDTO accountDataDTO = accountClient.getDataMyAccountById(userModel.getToken(), notificationDto.getAuthorId());
