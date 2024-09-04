@@ -9,9 +9,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.security.concurrent.DelegatingSecurityContextExecutorService;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Service
 @Slf4j
@@ -22,14 +26,22 @@ public class NotificationConsumer {
     @KafkaListener(topics = "${spring.kafka.kafkaMessageTopic}", groupId = "${spring.kafka.kafkaMessageGroupId}", containerFactory = "kafkaMessageConcurrentKafkaListenerContainerFactory")
     public void listen(@Payload NotificationDto notificationDto) {
         log.info("Received notification: {}", notificationDto);
-        SecurityContext securityContext = SecurityContextHolder.getContext();
-        SecurityContextHolderStrategyHelper.setContext(securityContext);
 
-        UserModel userModel = (UserModel) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        log.info("id {} token {} email {}", userModel.getId(), userModel.getToken(), userModel.getEmail());
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+
+        ExecutorService executorService = new DelegatingSecurityContextExecutorService(Executors.newSingleThreadExecutor());
+
+
+
+
 
         try {
-            kafkaMessageService.savingToNotificationRepository(notificationDto);
+            SecurityContextHolderStrategyHelper.setContext(securityContext);
+
+            executorService.submit(() -> kafkaMessageService.savingToNotificationRepository(notificationDto));
+
+
+//            kafkaMessageService.savingToNotificationRepository(notificationDto);
             log.info("Notification successfully saved: {}", notificationDto);
         } catch (Exception e) {
             log.error("Error saving notification: {}", notificationDto, e);
