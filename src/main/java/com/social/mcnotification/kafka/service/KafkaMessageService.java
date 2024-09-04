@@ -11,6 +11,7 @@ import com.social.mcnotification.enums.NotificationType;
 import com.social.mcnotification.model.NotificationSettingEntity;
 import com.social.mcnotification.repository.NotificationRepository;
 import com.social.mcnotification.repository.NotificationSettingRepository;
+import com.social.mcnotification.security.SecurityContextHolderStrategyHelper;
 import com.social.mcnotification.security.jwt.UserModel;
 import com.social.mcnotification.services.NotificationServiceImpl;
 import com.social.mcnotification.services.helper.Mapper;
@@ -20,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -51,9 +53,19 @@ public class KafkaMessageService {
         //принимаешь это сообщение
         //смотришь друзей этого пользователя --> friends
         //сохраняешь в БД столько уведомлений, сколько у пользователя друзей, меняя толкьо receiverId
-        NotificationType type = notificationDto.getNotificationType();
-        UserModel userModel = notificationService.getCurrentUser();
+
+        //
+        SecurityContext securityContext = SecurityContextHolderStrategyHelper.getContext();
+        Authentication authentication = securityContext.getAuthentication();
+        UserModel userModel = (UserModel) authentication.getPrincipal();
         log.info("id {} token {} email {}", userModel.getId(), userModel.getToken(), userModel.getEmail());
+
+        //
+
+
+        NotificationType type = notificationDto.getNotificationType();
+//        UserModel userModel = notificationService.getCurrentUser();
+//        log.info("id {} token {} email {}", userModel.getId(), userModel.getToken(), userModel.getEmail());
 
         AccountDataDTO accountDataDTO = accountClient.getDataMyAccountById(userModel.getToken(), notificationDto.getAuthorId());
         String nameAuthor = " " + accountDataDTO.getFirstName() + " " + accountDataDTO.getLastName();
