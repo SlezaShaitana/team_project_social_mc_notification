@@ -79,14 +79,14 @@ public class KafkaMessageService {
                 notificationDto.getIsReaded());
 
         NotificationEntity notification = new NotificationEntity();
-        notification.setAuthorId(notification.getAuthorId());
-        notification.setReceiverId(notification.getReceiverId());
-        notification.setNotificationType(notification.getNotificationType());
-        notification.setServiceName(notification.getServiceName());
-        notification.setContent(notification.getContent());
+        notification.setAuthorId(notificationDto.getAuthorId());
+        notification.setReceiverId(notificationDto.getReceiverId());
+        notification.setNotificationType(notificationDto.getNotificationType());
+        notification.setServiceName(notificationDto.getServiceName());
+        notification.setContent(notificationDto.getContent());
         notification.setIsReaded(false);
         notification.setSentTime(Timestamp.valueOf(LocalDateTime.now()));
-        notification.setEventId(notification.getEventId());
+        notification.setEventId(notificationDto.getEventId());
         log.info("Create notification entity: {}, type {}, authorId {}, receiverId {}, isReaded {}",
                 notification.getServiceName(),
                 notification.getNotificationType(),
