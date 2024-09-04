@@ -48,7 +48,11 @@ public class KafkaMessageService {
 //    @Async("taskExecutor")
     public void savingToNotificationRepository(NotificationDto notificationDto) {
         log.info("method savingToNotificationRepository");
-        log.info("Microservice {}, type {}", notificationDto.getServiceName(), notificationDto.getNotificationType());
+        log.info("Microservice {}, type {}, authorId {}, receiverId {}, isReaded {}", notificationDto.getServiceName(),
+                notificationDto.getNotificationType(),
+                notificationDto.getAuthorId(),
+                notificationDto.getReceiverId(),
+                notificationDto.getIsReaded());
 
         //Смотреть откуда пришло
 
