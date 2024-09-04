@@ -3,10 +3,13 @@ package com.social.mcnotification.kafka.listener;
 import com.social.mcnotification.dto.NotificationDto;
 import com.social.mcnotification.dto.RegistrationDto;
 import com.social.mcnotification.kafka.service.KafkaMessageService;
+import com.social.mcnotification.security.SecurityContextHolderStrategyHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -18,6 +21,8 @@ public class NotificationConsumer {
     @KafkaListener(topics = "${spring.kafka.kafkaMessageTopic}", groupId = "${spring.kafka.kafkaMessageGroupId}", containerFactory = "kafkaMessageConcurrentKafkaListenerContainerFactory")
     public void listen(@Payload NotificationDto notificationDto) {
         log.info("Received notification: {}", notificationDto);
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        SecurityContextHolderStrategyHelper.setContext(securityContext);
 
         try {
             kafkaMessageService.savingToNotificationRepository(notificationDto);
