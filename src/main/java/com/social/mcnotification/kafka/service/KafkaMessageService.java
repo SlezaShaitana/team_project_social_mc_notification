@@ -36,7 +36,7 @@ import java.util.UUID;
 @Slf4j
 public class KafkaMessageService {
 
-    private Mapper mapper;
+    private final Mapper mapper;
     private final NotificationRepository notificationRepository;
     private final NotificationSettingRepository notificationSettingRepository;
     private final FriendClient friendClient;
