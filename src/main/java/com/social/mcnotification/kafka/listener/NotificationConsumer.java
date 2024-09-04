@@ -4,6 +4,7 @@ import com.social.mcnotification.dto.NotificationDto;
 import com.social.mcnotification.dto.RegistrationDto;
 import com.social.mcnotification.kafka.service.KafkaMessageService;
 import com.social.mcnotification.security.SecurityContextHolderStrategyHelper;
+import com.social.mcnotification.security.jwt.UserModel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -23,6 +24,9 @@ public class NotificationConsumer {
         log.info("Received notification: {}", notificationDto);
         SecurityContext securityContext = SecurityContextHolder.getContext();
         SecurityContextHolderStrategyHelper.setContext(securityContext);
+
+        UserModel userModel = (UserModel) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        log.info("id {} token {} email {}", userModel.getId(), userModel.getToken(), userModel.getEmail());
 
         try {
             kafkaMessageService.savingToNotificationRepository(notificationDto);
