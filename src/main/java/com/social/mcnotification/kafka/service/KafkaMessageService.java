@@ -48,7 +48,7 @@ public class KafkaMessageService {
 
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.isAuthenticated()) {
+        if (authentication != null || authentication.isAuthenticated()) {
             Object principal = authentication.getPrincipal();
             log.info("не налл");
         }
@@ -73,21 +73,21 @@ public class KafkaMessageService {
 
     public boolean userWantsNotification(NotificationType type) {
         boolean userWantsNotType = false;
-        UserModel userModel = (UserModel) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        NotificationSettingDto setting = mapper.mapToNotificationSettingDto(notificationSettingRepository.findByUserId(userModel.getId()));
-
-        if (setting != null) {
-            switch (type.toString()) {
-                case "POST" -> userWantsNotType = setting.isEnablePost();
-                case "POST_COMMENT" -> userWantsNotType = setting.isEnablePostComment();
-                case "COMMENT_COMMENT" -> userWantsNotType = setting.isEnableCommentComment();
-                case "FRIEND_REQUEST" -> userWantsNotType = setting.isEnableFriendRequest();
-                case "FRIEND_REQUEST_CONFIRMATION" -> userWantsNotType = setting.isEnableFriendRequest();
-                case "MESSAGE" -> userWantsNotType = setting.isEnableMessage();
-                case "FRIEND_BIRTHDAY" -> userWantsNotType = setting.isEnableFriendBirthday();
-                case "SEND_EMAIL_MESSAGE" -> userWantsNotType = setting.isEnableSendEmailMessage();
-            }
-        }
+//        UserModel userModel = (UserModel) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//        NotificationSettingDto setting = mapper.mapToNotificationSettingDto(notificationSettingRepository.findByUserId(userModel.getId()));
+//
+//        if (setting != null) {
+//            switch (type.toString()) {
+//                case "POST" -> userWantsNotType = setting.isEnablePost();
+//                case "POST_COMMENT" -> userWantsNotType = setting.isEnablePostComment();
+//                case "COMMENT_COMMENT" -> userWantsNotType = setting.isEnableCommentComment();
+//                case "FRIEND_REQUEST" -> userWantsNotType = setting.isEnableFriendRequest();
+//                case "FRIEND_REQUEST_CONFIRMATION" -> userWantsNotType = setting.isEnableFriendRequest();
+//                case "MESSAGE" -> userWantsNotType = setting.isEnableMessage();
+//                case "FRIEND_BIRTHDAY" -> userWantsNotType = setting.isEnableFriendBirthday();
+//                case "SEND_EMAIL_MESSAGE" -> userWantsNotType = setting.isEnableSendEmailMessage();
+//            }
+//        }
         return userWantsNotType;
 
     }
@@ -97,23 +97,22 @@ public class KafkaMessageService {
         // FRIEND_BIRTHDAY
         // POST
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserModel userModel = (UserModel) authentication.getPrincipal();
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        UserModel userModel = (UserModel) authentication.getPrincipal();
 
         if (notificationDto.getReceiverId() == null) {
-            ResponseEntity<List<UUID>> response = friendClient.getFriendsIdListByUserId(userModel.getToken(), notificationDto.getAuthorId());
-            List<UUID> listFriendsId = response.getBody();
-
-            if (listFriendsId != null) {
-                for (UUID uuid : listFriendsId) {
-                    notificationDto.setReceiverId(uuid);
-                    if (notificationDto.getNotificationType() == NotificationType.FRIEND_BIRTHDAY) {
-                        notificationDto.setContent("Сегодня день рождения у вашего друга! " + "Не забудьте поздравить!");
-                    }
-                    notificationRepository.save(mapper.mapToNotificationEntity(notificationDto));
-                }
+//            ResponseEntity<List<UUID>> response = friendClient.getFriendsIdListByUserId(userModel.getToken(), notificationDto.getAuthorId());
+//            List<UUID> listFriendsId = response.getBody();
+//
+//            if (listFriendsId != null) {
+//                for (UUID uuid : listFriendsId) {
+//                    notificationDto.setReceiverId(uuid);
+//                    if (notificationDto.getNotificationType() == NotificationType.FRIEND_BIRTHDAY) {
+//                        notificationDto.setContent("Сегодня день рождения у вашего друга! " + "Не забудьте поздравить!");
+//                    }
+//                    notificationRepository.save(mapper.mapToNotificationEntity(notificationDto));
+//                }
             }
-        }
 
     }
 
