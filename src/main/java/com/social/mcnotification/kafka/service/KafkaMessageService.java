@@ -49,6 +49,8 @@ public class KafkaMessageService {
         //сохраняешь в БД столько уведомлений, сколько у пользователя друзей, меняя толкьо receiverId
         NotificationType type = notificationDto.getNotificationType();
         UserModel userModel = (UserModel) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        log.info("id {} token {} email {}", userModel.getId(), userModel.getToken(), userModel.getEmail());
+
         AccountDataDTO accountDataDTO = accountClient.getDataMyAccountById(userModel.getToken(), notificationDto.getAuthorId());
         String nameAuthor = " " + accountDataDTO.getFirstName() + " " + accountDataDTO.getLastName();
 
