@@ -227,7 +227,7 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public NotificationCountDto getEventsCount() {
         UserModel user = getCurrentUser();
-        log.info("Counting events for user: {}", user.getId());
+        log.info("Counting events for user: if {} email {} token {}", user.getId(), user.getEmail(), user.getToken());
 
         List<NotificationEntity> notifications = notificationRepository.findByReceiverId(user.getId());
         if (notifications.isEmpty()) {
