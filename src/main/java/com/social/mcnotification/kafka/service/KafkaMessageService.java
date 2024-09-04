@@ -46,13 +46,6 @@ public class KafkaMessageService {
     public void savingToNotificationRepository(NotificationDto notificationDto) {
         log.info("method savingToNotificationRepository");
 
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null || authentication.isAuthenticated()) {
-            Object principal = authentication.getPrincipal();
-            log.info("не налл");
-        }
-
         //Смотреть откуда пришло
 
         //Пример: пришла из постов
@@ -61,7 +54,6 @@ public class KafkaMessageService {
         //сохраняешь в БД столько уведомлений, сколько у пользователя друзей, меняя толкьо receiverId
 
         NotificationType type = notificationDto.getNotificationType();
-
         switch (notificationDto.getServiceName()) {
             case POST -> setNotificationMessageForPostMicroservice(type, notificationDto);
             case DIALOG -> setNotificationMessageForDialogMicroservice(notificationDto);
@@ -71,23 +63,22 @@ public class KafkaMessageService {
 
     }
 
-    public boolean userWantsNotification(NotificationType type) {
+    public boolean userWantsNotification(NotificationDto notificationDto, NotificationType type) {
         boolean userWantsNotType = false;
-//        UserModel userModel = (UserModel) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//        NotificationSettingDto setting = mapper.mapToNotificationSettingDto(notificationSettingRepository.findByUserId(userModel.getId()));
-//
-//        if (setting != null) {
-//            switch (type.toString()) {
-//                case "POST" -> userWantsNotType = setting.isEnablePost();
-//                case "POST_COMMENT" -> userWantsNotType = setting.isEnablePostComment();
-//                case "COMMENT_COMMENT" -> userWantsNotType = setting.isEnableCommentComment();
-//                case "FRIEND_REQUEST" -> userWantsNotType = setting.isEnableFriendRequest();
-//                case "FRIEND_REQUEST_CONFIRMATION" -> userWantsNotType = setting.isEnableFriendRequest();
-//                case "MESSAGE" -> userWantsNotType = setting.isEnableMessage();
-//                case "FRIEND_BIRTHDAY" -> userWantsNotType = setting.isEnableFriendBirthday();
-//                case "SEND_EMAIL_MESSAGE" -> userWantsNotType = setting.isEnableSendEmailMessage();
-//            }
-//        }
+        NotificationSettingDto setting = mapper.mapToNotificationSettingDto(notificationSettingRepository.findByUserId(notificationDto.getReceiverId()));
+
+        if (setting != null) {
+            switch (type.toString()) {
+                case "POST" -> userWantsNotType = setting.isEnablePost();
+                case "POST_COMMENT" -> userWantsNotType = setting.isEnablePostComment();
+                case "COMMENT_COMMENT" -> userWantsNotType = setting.isEnableCommentComment();
+                case "FRIEND_REQUEST" -> userWantsNotType = setting.isEnableFriendRequest();
+                case "FRIEND_REQUEST_CONFIRMATION" -> userWantsNotType = setting.isEnableFriendRequest();
+                case "MESSAGE" -> userWantsNotType = setting.isEnableMessage();
+                case "FRIEND_BIRTHDAY" -> userWantsNotType = setting.isEnableFriendBirthday();
+                case "SEND_EMAIL_MESSAGE" -> userWantsNotType = setting.isEnableSendEmailMessage();
+            }
+        }
         return userWantsNotType;
 
     }
@@ -118,7 +109,7 @@ public class KafkaMessageService {
 
     public void setNotificationMessageForPostMicroservice(NotificationType type, NotificationDto notificationDto) {
         boolean shouldBeSaved = false;
-        if (userWantsNotification(type)) {
+        if (userWantsNotification(notificationDto,type)) {
             if (type == NotificationType.POST) {
                 notifyAllFriends(notificationDto); //получают все друзья автора поста
             }
@@ -134,7 +125,7 @@ public class KafkaMessageService {
     }
 
     public void setNotificationMessageForAccountMicroservice(NotificationDto notificationDto) {
-        if (userWantsNotification(notificationDto.getNotificationType())) {
+        if (userWantsNotification(notificationDto, notificationDto.getNotificationType())) {
             notifyAllFriends(notificationDto);
         } else {
             log.info("User does not want to receive notifications of type: {}", notificationDto.getNotificationType());
@@ -143,7 +134,7 @@ public class KafkaMessageService {
 
     // type MESSAGE
     public void setNotificationMessageForDialogMicroservice(NotificationDto notificationDto) {
-        if (userWantsNotification(notificationDto.getNotificationType())) {
+        if (userWantsNotification(notificationDto, notificationDto.getNotificationType())) {
 //            notificationDto.setContent("Пользователь " + nameAuthor + " написал вам сообщение");
             // получит только тот кому отправили сообщение
             notificationRepository.save(mapper.mapToNotificationEntity(notificationDto));
@@ -153,7 +144,7 @@ public class KafkaMessageService {
     }
 
     public void setNotificationMessageForFriendMicroservice(NotificationType type, NotificationDto notificationDto) {
-        if (userWantsNotification(type) || type == NotificationType.FRIEND_REQUEST_CONFIRMATION) {
+        if (userWantsNotification(notificationDto, type) || type == NotificationType.FRIEND_REQUEST_CONFIRMATION) {
             notificationRepository.save(mapper.mapToNotificationEntity(notificationDto));
         } else {
             log.info("User does not want to receive notifications of type: {}", type);
