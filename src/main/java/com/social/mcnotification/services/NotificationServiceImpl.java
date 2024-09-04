@@ -20,6 +20,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -67,6 +68,7 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
+    @Async("taskExecutor")
     public void updateNotificationSettings(NotificationUpdateDto notificationUpdateDto) {
         UserModel user = getCurrentUser();
         log.info("Updating notification settings for user: {}", user.getId());

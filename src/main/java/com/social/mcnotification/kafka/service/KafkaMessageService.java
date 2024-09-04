@@ -72,6 +72,12 @@ public class KafkaMessageService {
     }
 
     public NotificationEntity createNotification(NotificationDto notificationDto) {
+        log.info("DTO: Microservice {}, type {}, authorId {}, receiverId {}, isReaded {}", notificationDto.getServiceName(),
+                notificationDto.getNotificationType(),
+                notificationDto.getAuthorId(),
+                notificationDto.getReceiverId(),
+                notificationDto.getIsReaded());
+
         NotificationEntity notification = new NotificationEntity();
         notification.setAuthorId(notification.getAuthorId());
         notification.setReceiverId(notification.getReceiverId());
