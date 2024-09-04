@@ -27,6 +27,8 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -62,6 +64,19 @@ public class KafkaMessageService {
             case ACCOUNT -> setNotificationMessageForAccountMicroservice(notificationDto);
         }
 
+    }
+
+    public NotificationEntity createNotification(NotificationDto notificationDto) {
+        NotificationEntity notification = new NotificationEntity();
+        notification.setAuthorId(notification.getAuthorId());
+        notification.setReceiverId(notification.getReceiverId());
+        notification.setNotificationType(notification.getNotificationType());
+        notification.setServiceName(notification.getServiceName());
+        notification.setContent(notification.getContent());
+        notification.setIsReaded(false);
+        notification.setSentTime(Timestamp.valueOf(LocalDateTime.now()));
+        notification.setEventId(notification.getEventId());
+        return notification;
     }
 
     public boolean userWantsNotification(NotificationDto notificationDto, NotificationType type) {
@@ -120,7 +135,9 @@ public class KafkaMessageService {
             shouldBeSaved = true;
         }
         if (shouldBeSaved) {
-            NotificationEntity notification = mapper.mapToNotificationEntity(notificationDto);
+            NotificationEntity notification = createNotification(notificationDto);
+
+
             notification.setIsReaded(false);
             notificationRepository.save(notification);
         }
@@ -140,7 +157,7 @@ public class KafkaMessageService {
         if (userWantsNotification(notificationDto, notificationDto.getNotificationType())) {
 //            notificationDto.setContent("Пользователь " + nameAuthor + " написал вам сообщение");
             // получит только тот кому отправили сообщение
-            NotificationEntity notification = mapper.mapToNotificationEntity(notificationDto);
+            NotificationEntity notification = createNotification(notificationDto);
             notification.setIsReaded(false);
 
             notificationRepository.save(notification);
@@ -151,7 +168,7 @@ public class KafkaMessageService {
 
     public void setNotificationMessageForFriendMicroservice(NotificationType type, NotificationDto notificationDto) {
         if (userWantsNotification(notificationDto, type) || type == NotificationType.FRIEND_REQUEST_CONFIRMATION) {
-            NotificationEntity notification = mapper.mapToNotificationEntity(notificationDto);
+            NotificationEntity notification = createNotification(notificationDto);
             notification.setIsReaded(false);
 
             notificationRepository.save(notification);
