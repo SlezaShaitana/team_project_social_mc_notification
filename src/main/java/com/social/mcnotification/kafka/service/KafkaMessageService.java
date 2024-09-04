@@ -81,6 +81,13 @@ public class KafkaMessageService {
         notification.setIsReaded(false);
         notification.setSentTime(Timestamp.valueOf(LocalDateTime.now()));
         notification.setEventId(notification.getEventId());
+        log.info("Create notification entity: {}, type {}, authorId {}, receiverId {}, isReaded {}",
+                notification.getServiceName(),
+                notification.getNotificationType(),
+                notification.getAuthorId(),
+                notification.getReceiverId(),
+                notification.getIsReaded());
+
         return notification;
     }
 
