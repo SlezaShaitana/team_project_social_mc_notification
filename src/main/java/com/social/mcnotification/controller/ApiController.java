@@ -55,7 +55,8 @@ public class ApiController {
     }
 
     @GetMapping("/page")
-    public ResponseEntity<PageNotificationsDto> getNotifications(@RequestParam(name = "page", defaultValue = "0") Integer page,
+    public ResponseEntity<PageNotificationsDto> getNotifications(@RequestHeader("Authorization") String headerRequestByAuth,
+                                                                 @RequestParam(name = "page", defaultValue = "0") Integer page,
                                                                  @RequestParam(name = "size", defaultValue = "10") Integer size,
                                                                  @RequestParam(name = "sort", required = false) String sort) {
 
@@ -66,7 +67,7 @@ public class ApiController {
             size = 1;
         }
 
-        return ResponseEntity.ok(notificationService.getNotifications(page, size, sort));
+        return ResponseEntity.ok(notificationService.getNotifications(page, size, sort, headerRequestByAuth));
     }
 
     @GetMapping("/count")

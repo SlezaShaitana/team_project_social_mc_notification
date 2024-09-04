@@ -22,26 +22,18 @@ import java.util.concurrent.Executors;
 @RequiredArgsConstructor
 public class NotificationConsumer {
     private final KafkaMessageService kafkaMessageService;
+//    private final KafkaService kafkaService;
 
     @KafkaListener(topics = "${spring.kafka.kafkaMessageTopic}", groupId = "${spring.kafka.kafkaMessageGroupId}", containerFactory = "kafkaMessageConcurrentKafkaListenerContainerFactory")
     public void listen(@Payload NotificationDto notificationDto) {
         log.info("Received notification: {}", notificationDto);
 
-        SecurityContext securityContext = SecurityContextHolder.getContext();
-
-        ExecutorService executorService = new DelegatingSecurityContextExecutorService(Executors.newSingleThreadExecutor());
-
-
-
-
+//        ExecutorService executorService = new DelegatingSecurityContextExecutorService(Executors.newSingleThreadExecutor());
 
         try {
-            SecurityContextHolderStrategyHelper.setContext(securityContext);
-
-            executorService.submit(() -> kafkaMessageService.savingToNotificationRepository(notificationDto));
-
-
-//            kafkaMessageService.savingToNotificationRepository(notificationDto);
+//            executorService.submit(() -> kafkaMessageService.savingToNotificationRepository(notificationDto));
+            kafkaMessageService.savingToNotificationRepository(notificationDto);
+//            kafkaService.savingToNotificationRepository(notificationDto);
             log.info("Notification successfully saved: {}", notificationDto);
         } catch (Exception e) {
             log.error("Error saving notification: {}", notificationDto, e);

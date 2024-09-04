@@ -23,6 +23,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -144,9 +145,11 @@ public class NotificationServiceImpl implements NotificationService {
         }
     }
 
+    public void creatingAdditionalNotifications(UserModel userModel) {}
+
 
     @Override
-    public PageNotificationsDto getNotifications(Integer page, Integer size, String sort) {
+    public PageNotificationsDto getNotifications(Integer page, Integer size, String sort, String headerRequestByAuth) {
         UserModel user = getCurrentUser();
         log.info("get Notification");
         String[] sortParts = sort.split(",");

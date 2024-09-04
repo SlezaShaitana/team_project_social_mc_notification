@@ -36,19 +36,23 @@ import java.util.UUID;
 @Slf4j
 public class KafkaMessageService {
 
-    //    private static final Logger log = LoggerFactory.getLogger(KafkaMessageService.class);
     private Mapper mapper;
     private final NotificationRepository notificationRepository;
     private final NotificationSettingRepository notificationSettingRepository;
     private final FriendClient friendClient;
-    private final AccountClient accountClient;
     private final List<NotificationDto> messages = new ArrayList<>();
 
-    private final NotificationServiceImpl notificationService;
-
-    @Async("taskExecutor")
+//    @Async("taskExecutor")
     public void savingToNotificationRepository(NotificationDto notificationDto) {
         log.info("method savingToNotificationRepository");
+
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+            Object principal = authentication.getPrincipal();
+            log.info("не налл");
+        }
+
         //Смотреть откуда пришло
 
         //Пример: пришла из постов
@@ -56,27 +60,13 @@ public class KafkaMessageService {
         //смотришь друзей этого пользователя --> friends
         //сохраняешь в БД столько уведомлений, сколько у пользователя друзей, меняя толкьо receiverId
 
-        //
-        SecurityContext securityContext = SecurityContextHolderStrategyHelper.getContext();
-        Authentication authentication = securityContext.getAuthentication();
-        UserModel userModel = (UserModel) authentication.getPrincipal();
-        log.info("id {} token {} email {}", userModel.getId(), userModel.getToken(), userModel.getEmail());
-
-        //
-
-
         NotificationType type = notificationDto.getNotificationType();
-//        UserModel userModel = notificationService.getCurrentUser();
-//        log.info("id {} token {} email {}", userModel.getId(), userModel.getToken(), userModel.getEmail());
-
-        AccountDataDTO accountDataDTO = accountClient.getDataMyAccountById(userModel.getToken(), notificationDto.getAuthorId());
-        String nameAuthor = " " + accountDataDTO.getFirstName() + " " + accountDataDTO.getLastName();
 
         switch (notificationDto.getServiceName()) {
-            case POST -> setNotificationMessageForPostMicroservice(type, notificationDto, nameAuthor);
-            case DIALOG -> setNotificationMessageForDialogMicroservice(notificationDto, nameAuthor);
-            case FRIENDS -> setNotificationMessageForFriendMicroservice(type, notificationDto, nameAuthor);
-            case ACCOUNT -> setNotificationMessageForAccountMicroservice(notificationDto, nameAuthor);
+            case POST -> setNotificationMessageForPostMicroservice(type, notificationDto);
+            case DIALOG -> setNotificationMessageForDialogMicroservice(notificationDto);
+            case FRIENDS -> setNotificationMessageForFriendMicroservice(type, notificationDto);
+            case ACCOUNT -> setNotificationMessageForAccountMicroservice(notificationDto);
         }
 
     }
@@ -102,7 +92,7 @@ public class KafkaMessageService {
 
     }
 
-    public void notifyAllFriends(NotificationDto notificationDto, String nameAuthor) {
+    public void notifyAllFriends(NotificationDto notificationDto) {
         // для типов уведомлений:
         // FRIEND_BIRTHDAY
         // POST
@@ -118,7 +108,7 @@ public class KafkaMessageService {
                 for (UUID uuid : listFriendsId) {
                     notificationDto.setReceiverId(uuid);
                     if (notificationDto.getNotificationType() == NotificationType.FRIEND_BIRTHDAY) {
-                        notificationDto.setContent("Сегодня день рождения у вашего друга " + nameAuthor + "Не забудьте поздравить!");
+                        notificationDto.setContent("Сегодня день рождения у вашего друга! " + "Не забудьте поздравить!");
                     }
                     notificationRepository.save(mapper.mapToNotificationEntity(notificationDto));
                 }
@@ -127,11 +117,11 @@ public class KafkaMessageService {
 
     }
 
-    public void setNotificationMessageForPostMicroservice(NotificationType type, NotificationDto notificationDto, String nameAuthor) {
+    public void setNotificationMessageForPostMicroservice(NotificationType type, NotificationDto notificationDto) {
         boolean shouldBeSaved = false;
         if (userWantsNotification(type)) {
             if (type == NotificationType.POST) {
-                notifyAllFriends(notificationDto, nameAuthor); //получают все друзья автора поста
+                notifyAllFriends(notificationDto); //получают все друзья автора поста
             }
             shouldBeSaved = true;
         }
@@ -144,16 +134,16 @@ public class KafkaMessageService {
 
     }
 
-    public void setNotificationMessageForAccountMicroservice(NotificationDto notificationDto, String nameAuthor) {
+    public void setNotificationMessageForAccountMicroservice(NotificationDto notificationDto) {
         if (userWantsNotification(notificationDto.getNotificationType())) {
-            notifyAllFriends(notificationDto, nameAuthor);
+            notifyAllFriends(notificationDto);
         } else {
             log.info("User does not want to receive notifications of type: {}", notificationDto.getNotificationType());
         }
     }
 
     // type MESSAGE
-    public void setNotificationMessageForDialogMicroservice(NotificationDto notificationDto, String nameAuthor) {
+    public void setNotificationMessageForDialogMicroservice(NotificationDto notificationDto) {
         if (userWantsNotification(notificationDto.getNotificationType())) {
 //            notificationDto.setContent("Пользователь " + nameAuthor + " написал вам сообщение");
             // получит только тот кому отправили сообщение
@@ -163,7 +153,7 @@ public class KafkaMessageService {
         }
     }
 
-    public void setNotificationMessageForFriendMicroservice(NotificationType type, NotificationDto notificationDto, String nameAuthor) {
+    public void setNotificationMessageForFriendMicroservice(NotificationType type, NotificationDto notificationDto) {
         if (userWantsNotification(type) || type == NotificationType.FRIEND_REQUEST_CONFIRMATION) {
             notificationRepository.save(mapper.mapToNotificationEntity(notificationDto));
         } else {
