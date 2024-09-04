@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -45,6 +46,7 @@ public class KafkaMessageService {
 
     private final NotificationServiceImpl notificationService;
 
+    @Async("taskExecutor")
     public void savingToNotificationRepository(NotificationDto notificationDto) {
         log.info("method savingToNotificationRepository");
         //Смотреть откуда пришло
