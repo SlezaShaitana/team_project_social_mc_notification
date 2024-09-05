@@ -14,7 +14,6 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-//@CrossOrigin(origins = "http://79.174.80.200")
 @RequestMapping("/api/v1/notifications")
 public class ApiController {
 
@@ -28,7 +27,6 @@ public class ApiController {
 
     @PutMapping("/settings")
     @PreAuthorize("isAuthenticated()")
-//    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')")
     public ResponseEntity<?> updateNotificationSettings(@RequestBody NotificationUpdateDto notificationUpdateDto) {
         notificationService.updateNotificationSettings(notificationUpdateDto);
         return new ResponseEntity<>(HttpStatus.OK);
@@ -59,14 +57,12 @@ public class ApiController {
                                                                  @RequestParam(name = "page", defaultValue = "0") Integer page,
                                                                  @RequestParam(name = "size", defaultValue = "10") Integer size,
                                                                  @RequestParam(name = "sort", required = false) String sort) {
-
         if (page < 0) {
             page = 0;
         }
         if (size < 1) {
             size = 1;
         }
-
         return ResponseEntity.ok(notificationService.getNotifications(page, size, sort, headerRequestByAuth));
     }
 

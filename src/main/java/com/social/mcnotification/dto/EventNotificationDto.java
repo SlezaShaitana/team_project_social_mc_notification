@@ -17,13 +17,4 @@ public class EventNotificationDto {
     private NotificationType notificationType;
     private String content;
 
-
-    public EventNotificationDto(NotificationEntity notificationEntity) {
-        this.authorId = notificationEntity.getAuthorId();
-        this.receiverId = notificationEntity.getReceiverId();
-        this.notificationType = notificationEntity.getNotificationType();
-        this.content = notificationEntity.getContent();
-
-    }
-
 }

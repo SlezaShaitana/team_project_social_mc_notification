@@ -2,7 +2,6 @@ package com.social.mcnotification.kafka.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.social.mcnotification.dto.NotificationDto;
-//import com.social.mcnotification.dto.RegistrationDto;
 import com.social.mcnotification.dto.RegistrationDto;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -65,7 +64,6 @@ public class KafkaConfiguration {
 
         ErrorHandlingDeserializer<RegistrationDto> errorHandlingDeserializer =
                 new ErrorHandlingDeserializer<>(jsonDeserializer);
-
         return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(), errorHandlingDeserializer);
     }
 
@@ -76,48 +74,6 @@ public class KafkaConfiguration {
         factory.setConsumerFactory(kafkaMessageConsumerFactory);
         return factory;
     }
-
-
-
-
-//    @Bean
-//    public ObjectMapper objectMapper() {
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        objectMapper.configure(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-//        return objectMapper;
-//    }
-//
-//    @Bean
-//    public ConsumerFactory<String, NotificationDto> kafkaMessageConsumerFactory(ObjectMapper objectMapper) {
-//        Map<String, Object> config = new HashMap<>();
-//        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootStrapServers);
-//        config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-////        config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
-//        config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
-//        config.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, JsonDeserializer.class.getName());
-//        config.put(ConsumerConfig.GROUP_ID_CONFIG, kafkaMessageGroupId);
-//        config.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
-//
-//        JsonDeserializer<NotificationDto> jsonDeserializer = new JsonDeserializer<>(NotificationDto.class, objectMapper);
-//        jsonDeserializer.setRemoveTypeHeaders(false);
-//        jsonDeserializer.addTrustedPackages("*");
-//        jsonDeserializer.setUseTypeMapperForKey(true);
-//
-//        log.info("Kafka Consumer Factory configured with bootstrap servers: {}", bootStrapServers);
-//
-//        ErrorHandlingDeserializer<NotificationDto> errorHandlingDeserializer =
-//                new ErrorHandlingDeserializer<>(jsonDeserializer);
-//
-//        return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(), errorHandlingDeserializer);
-//
-//
-////        return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(), new JsonDeserializer<>(objectMapper));
-//
-////        return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(), jsonDeserializer);
-//    }
-
-
-    // из аккаунта
 
     @Bean
     public ConsumerFactory<String, NotificationDto> kafkaMessageConsumerFactory(ObjectMapper objectMapper) {
@@ -134,7 +90,6 @@ public class KafkaConfiguration {
 
         ErrorHandlingDeserializer<NotificationDto> errorHandlingDeserializer =
                 new ErrorHandlingDeserializer<>(jsonDeserializer);
-
         return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(), errorHandlingDeserializer);
     }
 
@@ -145,7 +100,4 @@ public class KafkaConfiguration {
         factory.setConsumerFactory(kafkaMessageConsumerFactory);
         return factory;
     }
-
-
-
 }

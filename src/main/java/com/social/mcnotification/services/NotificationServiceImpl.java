@@ -1,12 +1,9 @@
 package com.social.mcnotification.services;
 
-import com.social.mcnotification.client.FriendClient;
 import com.social.mcnotification.dto.*;
 import com.social.mcnotification.dto.response.PageNotificationsDto;
 import com.social.mcnotification.dto.response.PageableObject;
-import com.social.mcnotification.enums.NotificationType;
 import com.social.mcnotification.exceptions.InvalidNotificationTypeException;
-import com.social.mcnotification.exceptions.NotificationSettingNotFoundException;
 import com.social.mcnotification.model.NotificationEntity;
 import com.social.mcnotification.model.NotificationSettingEntity;
 import com.social.mcnotification.repository.NotificationRepository;
@@ -16,17 +13,11 @@ import com.social.mcnotification.services.helper.Mapper;
 import com.social.mcnotification.specifications.NotificationsSpecifications;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestHeader;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -55,7 +46,6 @@ public class NotificationServiceImpl implements NotificationService {
         throw new IllegalStateException("Current user is not of type UserModel");
     }
 
-
     @Override
     public NotificationSettingDto getNotificationSettings() {
         UserModel user = getCurrentUser();
@@ -65,7 +55,6 @@ public class NotificationServiceImpl implements NotificationService {
         if (settingEntity == null) {
             log.info("Notification settings not found for user: " + user.getId());
         }
-
         return mapper.mapToNotificationSettingDto(settingEntity);
     }
 
@@ -81,7 +70,6 @@ public class NotificationServiceImpl implements NotificationService {
             settingEntity = new NotificationSettingEntity();
             settingEntity.setUserId(getCurrentUser().getId());
         }
-
         Boolean setting = notificationUpdateDto.getEnable();
         switch (notificationUpdateDto.getNotificationType()) {
             case POST -> settingEntity.setEnablePost(setting);
@@ -94,7 +82,6 @@ public class NotificationServiceImpl implements NotificationService {
             default ->
                     throw new InvalidNotificationTypeException("Unknown notification type: " + notificationUpdateDto.getNotificationType());
         }
-
         notificationSettingRepository.save(settingEntity);
         log.info("Notification settings updated for user: {} to {}", user.getId(), setting);
     }
@@ -103,7 +90,6 @@ public class NotificationServiceImpl implements NotificationService {
     public void markAllEventsAsRead() {
         UserModel user = getCurrentUser();
         log.info("Marking all notifications as read for user: {}", user.getId());
-
         List<NotificationEntity> notifications = notificationRepository.findByReceiverId(user.getId());
         if (notifications.isEmpty()) {
             log.info("No notifications found for user: {} ", user.getId());
@@ -120,7 +106,6 @@ public class NotificationServiceImpl implements NotificationService {
             throw new IllegalArgumentException("ID cannot be null");
         }
         log.info("Creating notification settings for user: {}", id);
-
         NotificationSettingDto notificationSettingDto = new NotificationSettingDto();
         notificationSettingDto.setUserId(id);
         NotificationSettingEntity settingEntity = mapper.mapToSettingEntity(notificationSettingDto);
@@ -148,9 +133,6 @@ public class NotificationServiceImpl implements NotificationService {
         }
     }
 
-    public void creatingAdditionalNotifications(UserModel userModel) {}
-
-
     @Override
     public PageNotificationsDto getNotifications(Integer page, Integer size, String sort, String headerRequestByAuth) {
         UserModel user = getCurrentUser();
@@ -168,9 +150,7 @@ public class NotificationServiceImpl implements NotificationService {
         log.info("Прочитано {} событий", pageNotifications.get().count());
         NotificationsDto[] content = getNotificationsDtos(pageNotifications);
         PageableObject pageableObject = getPageableObject(pageable, sortObj);
-
         return getPageNotificationsDto(pageable, pageNotifications, content, pageableObject, sortObj);
-
     }
 
     private static PageNotificationsDto getPageNotificationsDto(Pageable page, Page<NotificationEntity> pageNotifications, NotificationsDto[] content, PageableObject pageableObject, Sort sortObj) {

@@ -18,8 +18,6 @@ public class NotificationsSpecifications {
 
     // * добавить поддержку спецификаций JpaSpecificationExecutor в репозиторий NotificationRepository
 
-
-
     public static Specification<NotificationEntity> notByNotificationTypes(List<NotificationType> types) {
         return (root, query, criteriaBuilder) -> criteriaBuilder.not(root.get("type").in(types));
     }
@@ -34,7 +32,6 @@ public class NotificationsSpecifications {
                 return criteriaBuilder.conjunction(); // Возвращает пустое условие, если isReaded равно null
             }
             return criteriaBuilder.equal(root.get("isReaded"), isReaded);
-
         };
 
     }

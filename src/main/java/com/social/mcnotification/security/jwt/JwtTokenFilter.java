@@ -48,23 +48,10 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 log.info("Token validated" + token);
 
                 UserModel user = jwtUtils.parseUserFromToken(token);
-
-//                UUID id = UUID.fromString(jwtUtils.getId(token));
-//                String email = jwtUtils.getEmail(token);
-//                List<String> roles = jwtUtils.getRoles(token);
-
-//                Collection<? extends GrantedAuthority> authorities = roles.stream()
-//                        .map(SimpleGrantedAuthority::new)
-//                        .collect(Collectors.toList());
-
-//                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-//                        email, null, authorities);
-
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                         user, null, user.getAuthorities());
 
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
             } else {

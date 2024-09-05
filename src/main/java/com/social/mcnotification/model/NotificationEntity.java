@@ -31,7 +31,6 @@ public class NotificationEntity {
     @Column(name = "service_name")
     @Enumerated(EnumType.STRING)
     private MicroServiceName serviceName;
-    // из какого микросервиса отправлено
     @Column(name = "sent_time", columnDefinition = "TIMESTAMP", nullable = false)
     private Timestamp sentTime;
     @Column(name = "event_id")
