@@ -42,7 +42,6 @@ public class NotificationServiceImpl implements NotificationService {
     private final NotificationRepository notificationRepository;
     private final NotificationSettingRepository notificationSettingRepository;
     private final Mapper mapper;
-    private final FriendClient friendClient;
 //        private final Logger logger = LogManager.getLogger(NotificationServiceImpl.class);
 
 
