@@ -1,30 +1,24 @@
 package com.social.mcnotification.kafka.service;
 
 import com.social.mcnotification.client.AccountClient;
+import com.social.mcnotification.client.AuthClient;
 import com.social.mcnotification.client.FriendClient;
 import com.social.mcnotification.client.dto.AccountDataDTO;
+import com.social.mcnotification.client.dto.AuthenticateDto;
+import com.social.mcnotification.client.dto.AuthenticateResponseDto;
 import com.social.mcnotification.dto.NotificationDto;
 import com.social.mcnotification.dto.NotificationSettingDto;
 import com.social.mcnotification.dto.RegistrationDto;
-import com.social.mcnotification.enums.MicroServiceName;
 import com.social.mcnotification.enums.NotificationType;
 import com.social.mcnotification.model.NotificationEntity;
 import com.social.mcnotification.model.NotificationSettingEntity;
 import com.social.mcnotification.repository.NotificationRepository;
 import com.social.mcnotification.repository.NotificationSettingRepository;
-import com.social.mcnotification.security.SecurityContextHolderStrategyHelper;
 import com.social.mcnotification.security.jwt.UserModel;
-import com.social.mcnotification.services.NotificationServiceImpl;
 import com.social.mcnotification.services.helper.Mapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -44,6 +38,9 @@ public class KafkaMessageService {
     private final NotificationSettingRepository notificationSettingRepository;
     private final FriendClient friendClient;
     private final List<NotificationDto> messages = new ArrayList<>();
+    private final String email = "sasha@gmail.com";
+    private final String password = "abc";
+    private final AuthClient authClient;
 
 //    @Async("taskExecutor")
     public void savingToNotificationRepository(NotificationDto notificationDto) {
@@ -53,6 +50,9 @@ public class KafkaMessageService {
                 notificationDto.getAuthorId(),
                 notificationDto.getReceiverId(),
                 notificationDto.getIsReaded());
+
+        String token = login();
+        log.info("login success {}", token);
 
         //Смотреть откуда пришло
 
@@ -72,12 +72,6 @@ public class KafkaMessageService {
     }
 
     public NotificationEntity createNotification(NotificationDto notificationDto) {
-        log.info("DTO: Microservice {}, type {}, authorId {}, receiverId {}, isReaded {}", notificationDto.getServiceName(),
-                notificationDto.getNotificationType(),
-                notificationDto.getAuthorId(),
-                notificationDto.getReceiverId(),
-                notificationDto.getIsReaded());
-
         NotificationEntity notification = new NotificationEntity();
         notification.setAuthorId(notificationDto.getAuthorId());
         notification.setReceiverId(notificationDto.getReceiverId());
@@ -87,12 +81,6 @@ public class KafkaMessageService {
         notification.setIsReaded(false);
         notification.setSentTime(Timestamp.valueOf(LocalDateTime.now()));
         notification.setEventId(notificationDto.getEventId());
-        log.info("Create notification entity: {}, type {}, authorId {}, receiverId {}, isReaded {}",
-                notification.getServiceName(),
-                notification.getNotificationType(),
-                notification.getAuthorId(),
-                notification.getReceiverId(),
-                notification.getIsReaded());
 
         return notification;
     }
@@ -111,6 +99,9 @@ public class KafkaMessageService {
                 case "MESSAGE" -> userWantsNotType = setting.isEnableMessage();
                 case "FRIEND_BIRTHDAY" -> userWantsNotType = setting.isEnableFriendBirthday();
                 case "SEND_EMAIL_MESSAGE" -> userWantsNotType = setting.isEnableSendEmailMessage();
+
+                case "LIKE_POST" -> userWantsNotType = true;
+                case "LIKE_COMMENT" -> userWantsNotType = true;
             }
         }
         return userWantsNotType;
@@ -118,14 +109,12 @@ public class KafkaMessageService {
     }
 
     public void notifyAllFriends(NotificationDto notificationDto) {
-        // для типов уведомлений:
-        // FRIEND_BIRTHDAY
-        // POST
-
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        UserModel userModel = (UserModel) authentication.getPrincipal();
-
-        if (notificationDto.getReceiverId() == null) {
+//         для типов уведомлений:
+//         FRIEND_BIRTHDAY
+//         POST
+//        UserModel userModel = getCurrentUser();
+//
+//        if (notificationDto.getReceiverId() == null) {
 //            ResponseEntity<List<UUID>> response = friendClient.getFriendsIdListByUserId(userModel.getToken(), notificationDto.getAuthorId());
 //            List<UUID> listFriendsId = response.getBody();
 //
@@ -137,9 +126,12 @@ public class KafkaMessageService {
 //                    }
 //                    notificationRepository.save(mapper.mapToNotificationEntity(notificationDto));
 //                }
-            }
-
+//            }
+//
+//        }
     }
+
+
 
     public void setNotificationMessageForPostMicroservice(NotificationType type, NotificationDto notificationDto) {
         boolean shouldBeSaved = false;
@@ -147,19 +139,9 @@ public class KafkaMessageService {
             if (type == NotificationType.POST) {
                 notifyAllFriends(notificationDto); //получают все друзья автора поста
             }
-            shouldBeSaved = true;
-        }
-        if (type == NotificationType.LIKE_POST || type == NotificationType.LIKE_COMMENT) { // получит только автор
-            shouldBeSaved = true;
-        }
-        if (shouldBeSaved) {
             NotificationEntity notification = createNotification(notificationDto);
-
-
-            notification.setIsReaded(false);
             notificationRepository.save(notification);
         }
-
     }
 
     public void setNotificationMessageForAccountMicroservice(NotificationDto notificationDto) {
@@ -185,7 +167,7 @@ public class KafkaMessageService {
     }
 
     public void setNotificationMessageForFriendMicroservice(NotificationType type, NotificationDto notificationDto) {
-        if (userWantsNotification(notificationDto, type) || type == NotificationType.FRIEND_REQUEST_CONFIRMATION) {
+        if (userWantsNotification(notificationDto, type)) {
             NotificationEntity notification = createNotification(notificationDto);
             notification.setIsReaded(false);
 
@@ -218,5 +200,11 @@ public class KafkaMessageService {
 
     public Optional<NotificationDto> findById(UUID id) {
         return messages.stream().filter(not -> not.getId().equals(id)).findFirst();
+    }
+
+    public String login() {
+        ResponseEntity<AuthenticateResponseDto> response = authClient.login(new AuthenticateDto(email, password));
+        AuthenticateResponseDto authenticateResponseDto = response.getBody();
+        return authenticateResponseDto.getAccessToken();
     }
 }

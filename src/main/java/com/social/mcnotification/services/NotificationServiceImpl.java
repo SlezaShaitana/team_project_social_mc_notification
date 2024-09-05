@@ -1,5 +1,6 @@
 package com.social.mcnotification.services;
 
+import com.social.mcnotification.client.FriendClient;
 import com.social.mcnotification.dto.*;
 import com.social.mcnotification.dto.response.PageNotificationsDto;
 import com.social.mcnotification.dto.response.PageableObject;
@@ -20,6 +21,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -40,6 +42,7 @@ public class NotificationServiceImpl implements NotificationService {
     private final NotificationRepository notificationRepository;
     private final NotificationSettingRepository notificationSettingRepository;
     private final Mapper mapper;
+    private final FriendClient friendClient;
 //        private final Logger logger = LogManager.getLogger(NotificationServiceImpl.class);
 
 
