@@ -1,10 +1,10 @@
 package com.social.mcnotification.client.dto;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
-@RequiredArgsConstructor
-@Getter
+@Data
+@AllArgsConstructor
+@Builder
 public class AuthenticateResponseDto {
     private final String accessToken;
     private final String refreshToken;
