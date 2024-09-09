@@ -80,13 +80,12 @@ public class KafkaMessageService {
     public void notifyAllFriends(NotificationDto notificationDto) {
         AuthenticateResponseDto authenticateResponseDto = login();
         log.info("authenticateResponseDto: {}", authenticateResponseDto);
-        ResponseEntity<List<UUID>> response = friendClient.getFriendsIdListByUserId(authenticateResponseDto.getAccessToken(), notificationDto.getAuthorId());
+        String headerRequestByAuth = authenticateResponseDto.getAccessToken();
+        List<UUID> response = friendClient.getFriendsIdListByUserId(headerRequestByAuth, notificationDto.getAuthorId().toString());
+        log.info("friends list size: {}", response);
 
-        List<UUID> listFriendsId = response.getBody();
-        log.info("friends list size: {}", listFriendsId);
-
-        if (listFriendsId != null) {
-            for (UUID id : listFriendsId) {
+        if (response != null) {
+            for (UUID id : response) {
                 notificationDto.setReceiverId(id);
                 if (userWantsNotification(notificationDto)) {
                     if (notificationDto.getNotificationType() == NotificationType.FRIEND_BIRTHDAY) {
