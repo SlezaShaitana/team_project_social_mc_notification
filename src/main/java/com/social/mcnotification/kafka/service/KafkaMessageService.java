@@ -81,10 +81,8 @@ public class KafkaMessageService {
     // for type: FRIEND_BIRTHDAY, POST
     public void notifyAllFriends(NotificationDto notificationDto) {
         AuthenticateResponseDto authenticateResponseDto = login();
-        log.info("authenticateResponseDto: {}", authenticateResponseDto);
         String headerRequestByAuth = authenticateResponseDto.getAccessToken();
         List<UUID> response = friendClient.getFriendsIdListByUserId("Bearer " + headerRequestByAuth, notificationDto.getAuthorId().toString());
-        log.info("friends list size: {}", response);
 
         if (response != null) {
             for (UUID id : response) {
@@ -106,7 +104,9 @@ public class KafkaMessageService {
         if (notificationDto.getNotificationType() == NotificationType.POST) {
             notifyAllFriends(notificationDto);
         } else {
-            if (notificationDto.getNotificationType() != NotificationType.POST && userWantsNotification(notificationDto)) {
+            if (userWantsNotification(notificationDto)) {
+                notificationDto.setIsReaded(false);
+                notificationDto.setSentTime(Timestamp.valueOf(LocalDateTime.now()));
                 NotificationEntity notification = mapper.createNotification(notificationDto);
                 notificationRepository.save(notification);
             }
@@ -123,7 +123,6 @@ public class KafkaMessageService {
     public void setNotificationMessageForDialogMicroservice(NotificationDto notificationDto) {
         if (userWantsNotification(notificationDto)) {
             NotificationEntity notification = mapper.createNotification(notificationDto);
-            notification.setIsReaded(false);
             notificationRepository.save(notification);
         }
     }
@@ -131,7 +130,6 @@ public class KafkaMessageService {
     public void setNotificationMessageForFriendMicroservice(NotificationDto notificationDto) {
         if (userWantsNotification(notificationDto)) {
             NotificationEntity notification = mapper.createNotification(notificationDto);
-            notification.setIsReaded(false);
             notificationRepository.save(notification);
         }
     }
