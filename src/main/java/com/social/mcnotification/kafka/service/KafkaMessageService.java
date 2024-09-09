@@ -18,6 +18,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -87,6 +89,8 @@ public class KafkaMessageService {
         if (response != null) {
             for (UUID id : response) {
                 notificationDto.setReceiverId(id);
+                notificationDto.setIsReaded(false);
+                notificationDto.setSentTime(Timestamp.valueOf(LocalDateTime.now()));
                 if (userWantsNotification(notificationDto)) {
                     if (notificationDto.getNotificationType() == NotificationType.FRIEND_BIRTHDAY) {
                         notificationDto.setContent("Сегодня у вашего друга день рождения! Не забудьте поздравить!");
