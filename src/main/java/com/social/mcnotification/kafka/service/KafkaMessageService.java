@@ -81,7 +81,7 @@ public class KafkaMessageService {
         AuthenticateResponseDto authenticateResponseDto = login();
         log.info("authenticateResponseDto: {}", authenticateResponseDto);
         String headerRequestByAuth = authenticateResponseDto.getAccessToken();
-        List<UUID> response = friendClient.getFriendsIdListByUserId(headerRequestByAuth, notificationDto.getAuthorId().toString());
+        List<UUID> response = friendClient.getFriendsIdListByUserId("Bearer " + headerRequestByAuth, notificationDto.getAuthorId().toString());
         log.info("friends list size: {}", response);
 
         if (response != null) {
