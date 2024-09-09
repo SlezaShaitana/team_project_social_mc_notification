@@ -19,9 +19,9 @@ public interface FriendClient {
 //    public ResponseEntity<List<UUID>> getAllFriendsIdList();
 
     @GetMapping("/friendId/{id}")
-    public ResponseEntity<List<UUID>> getFriendsIdListByUserId(@RequestHeader("Authorization") String headerRequestByAuth , @PathVariable("id") UUID uuid);
+    ResponseEntity<List<UUID>> getFriendsIdListByUserId(@RequestHeader("Authorization") String headerRequestByAuth, @PathVariable("id") UUID uuid);
 
     @GetMapping("/blockFriendId")
-    public ResponseEntity<List<UUID>> getFriendsWhoBlockedUser();
+    ResponseEntity<List<UUID>> getFriendsWhoBlockedUser();
 
 }

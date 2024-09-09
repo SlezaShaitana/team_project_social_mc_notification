@@ -78,9 +78,12 @@ public class KafkaMessageService {
 
     // for type: FRIEND_BIRTHDAY, POST
     public void notifyAllFriends(NotificationDto notificationDto) {
-        String token = login();
-        ResponseEntity<List<UUID>> response = friendClient.getFriendsIdListByUserId(token, notificationDto.getAuthorId());
+        AuthenticateResponseDto authenticateResponseDto = login();
+        log.info("authenticateResponseDto: {}", authenticateResponseDto);
+        ResponseEntity<List<UUID>> response = friendClient.getFriendsIdListByUserId(authenticateResponseDto.getAccessToken(), notificationDto.getAuthorId());
+
         List<UUID> listFriendsId = response.getBody();
+        log.info("friends list size: {}", listFriendsId);
 
         if (listFriendsId != null) {
             for (UUID id : listFriendsId) {
@@ -152,10 +155,10 @@ public class KafkaMessageService {
         return messages.stream().filter(not -> not.getId().equals(id)).findFirst();
     }
 
-    public String login() {
+    public AuthenticateResponseDto login() {
         ResponseEntity<AuthenticateResponseDto> response = authClient.login(new AuthenticateDto(email, password));
         AuthenticateResponseDto authenticateResponseDto = response.getBody();
         log.info("AccessToken: {}, refreshToken: {}", authenticateResponseDto.getAccessToken(), authenticateResponseDto.getRefreshToken());
-        return authenticateResponseDto.getAccessToken();
+        return authenticateResponseDto;
     }
 }
