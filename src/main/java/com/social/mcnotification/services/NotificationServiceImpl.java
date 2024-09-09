@@ -73,20 +73,6 @@ public class NotificationServiceImpl implements NotificationService {
         UserModel user = getCurrentUser();
         log.info("Updating notification settings for user: {}", user.getId());
         NotificationSettingEntity settingEntity = notificationSettingRepository.findByUserId(user.getId());
-
-//        if (settingEntity == null) {
-//            log.error("Notification settings not found for user: {} ", user.getId());
-////            throw new NotificationSettingNotFoundException("Notification settings not found for user");
-//            settingEntity = new NotificationSettingEntity();
-//            settingEntity.setUserId(getCurrentUser().getId());
-//            settingEntity.setEnableLike(true);
-//            settingEntity.setEnablePostComment(true);
-//            settingEntity.setEnableFriendRequest(true);
-//            settingEntity.setEnableCommentComment(true);
-//            settingEntity.setEnableFriendBirthday(true);
-//            settingEntity.setEnablePost(true);
-//            settingEntity.setEnableMessage(true);
-//        }
         Boolean setting = notificationUpdateDto.getEnable();
         switch (notificationUpdateDto.getNotificationType()) {
             case POST -> settingEntity.setEnablePost(setting);
