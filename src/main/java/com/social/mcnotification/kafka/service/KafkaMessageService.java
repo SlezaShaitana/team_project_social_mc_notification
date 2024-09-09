@@ -52,12 +52,12 @@ public class KafkaMessageService {
         }
     }
 
-    public boolean userWantsNotification(NotificationDto notificationDto, NotificationType type) {
+    public boolean userWantsNotification(NotificationDto notificationDto) {
         boolean userWantsNotType = false;
         NotificationSettingDto setting = mapper.mapToNotificationSettingDto(notificationSettingRepository.findByUserId(notificationDto.getReceiverId()));
 
         if (setting != null) {
-            switch (type.toString()) {
+            switch (notificationDto.getNotificationType().toString()) {
                 case "POST" -> userWantsNotType = setting.isEnablePost();
                 case "POST_COMMENT" -> userWantsNotType = setting.isEnablePostComment();
                 case "COMMENT_COMMENT" -> userWantsNotType = setting.isEnableCommentComment();
@@ -79,44 +79,43 @@ public class KafkaMessageService {
     // for type: FRIEND_BIRTHDAY, POST
     public void notifyAllFriends(NotificationDto notificationDto) {
         String token = login();
+        ResponseEntity<List<UUID>> response = friendClient.getFriendsIdListByUserId(token, notificationDto.getAuthorId());
+        List<UUID> listFriendsId = response.getBody();
 
-        if (notificationDto.getReceiverId() == null) {
-            ResponseEntity<List<UUID>> response = friendClient.getFriendsIdListByUserId(token, notificationDto.getAuthorId());
-            List<UUID> listFriendsId = response.getBody();
-
-            if (listFriendsId != null) {
-                for (UUID uuid : listFriendsId) {
-                    notificationDto.setReceiverId(uuid);
+        if (listFriendsId != null) {
+            for (UUID id : listFriendsId) {
+                notificationDto.setReceiverId(id);
+                if (userWantsNotification(notificationDto)) {
                     if (notificationDto.getNotificationType() == NotificationType.FRIEND_BIRTHDAY) {
                         notificationDto.setContent("Сегодня у вашего друга день рождения! Не забудьте поздравить!");
                     }
                     notificationRepository.save(mapper.mapToNotificationEntity(notificationDto));
                 }
             }
-
         }
     }
 
     //получают все друзья автора поста
     public void setNotificationMessageForPostMicroservice(NotificationDto notificationDto) {
-        if (userWantsNotification(notificationDto, notificationDto.getNotificationType())) {
-            if (notificationDto.getNotificationType() == NotificationType.POST) {
-                notifyAllFriends(notificationDto);
+        if (notificationDto.getNotificationType() == NotificationType.POST) {
+            notifyAllFriends(notificationDto);
+        } else {
+            if (notificationDto.getNotificationType() != NotificationType.POST && userWantsNotification(notificationDto)) {
+                NotificationEntity notification = mapper.createNotification(notificationDto);
+                notificationRepository.save(notification);
             }
-            NotificationEntity notification = mapper.createNotification(notificationDto);
-            notificationRepository.save(notification);
         }
     }
 
     public void setNotificationMessageForAccountMicroservice(NotificationDto notificationDto) {
-        if (userWantsNotification(notificationDto, notificationDto.getNotificationType())) {
+        if (userWantsNotification(notificationDto)) {
             notifyAllFriends(notificationDto);
         }
     }
 
     // получит только тот кому отправили сообщение
     public void setNotificationMessageForDialogMicroservice(NotificationDto notificationDto) {
-        if (userWantsNotification(notificationDto, notificationDto.getNotificationType())) {
+        if (userWantsNotification(notificationDto)) {
             NotificationEntity notification = mapper.createNotification(notificationDto);
             notification.setIsReaded(false);
             notificationRepository.save(notification);
@@ -124,7 +123,7 @@ public class KafkaMessageService {
     }
 
     public void setNotificationMessageForFriendMicroservice(NotificationDto notificationDto) {
-        if (userWantsNotification(notificationDto, notificationDto.getNotificationType())) {
+        if (userWantsNotification(notificationDto)) {
             NotificationEntity notification = mapper.createNotification(notificationDto);
             notification.setIsReaded(false);
             notificationRepository.save(notification);
