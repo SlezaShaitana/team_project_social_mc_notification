@@ -1,6 +1,7 @@
 package com.social.mcnotification.services;
 
 import com.social.mcnotification.dto.*;
+import com.social.mcnotification.dto.response.PageNotificationsDto;
 import com.social.mcnotification.enums.NotificationType;
 import com.social.mcnotification.model.NotificationEntity;
 import com.social.mcnotification.model.NotificationSettingEntity;
@@ -18,6 +19,10 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -209,12 +214,29 @@ public class NotificationServiceImplTest {
         verify(notificationRepository, times(1)).findByReceiverId(user.getId());
     }
 
-    // Ниже методы которые осталось дописать !!!!!!!!!!!!!!!!!!!!!!
+    @Test
+    public void testGetNotifications() {
+        Integer page = 10;
+        Integer size = 10;
+        String sort = "field,desc";
+        String headerRequestByAuth = null;
 
+        when(authentication.getPrincipal()).thenReturn(user);
+        when(service.getCurrentUser()).thenReturn(user);
 
+        List<NotificationEntity> notifications = new ArrayList<>();
+        notifications.add(new NotificationEntity());
+        notifications.add(new NotificationEntity());
 
-//    @Test
-//    public void testGetNotifications() {
-//    }
+        Page<NotificationEntity> pageNotifications = new PageImpl<>(notifications);
+
+        when(notificationRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(pageNotifications);
+
+        PageNotificationsDto result = service.getNotifications(page, size, sort, headerRequestByAuth);
+
+        assertNotNull(result);
+        assertEquals(2, result.getContent().length);
+        verify(notificationRepository, times(1)).findAll(any(Specification.class), any(Pageable.class));
+    }
 
 }

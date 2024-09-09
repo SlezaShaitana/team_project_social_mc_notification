@@ -4,6 +4,7 @@ import com.social.mcnotification.dto.NotificationsDto;
 import com.social.mcnotification.dto.SortDto;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder

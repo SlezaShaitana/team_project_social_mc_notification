@@ -9,7 +9,8 @@ spring:
 
 
   datasource:
-    url: jdbc:postgresql://localhost:5435/not
+#    url: jdbc:postgresql://localhost:5435/not
+    url: jdbc:postgresql://localhost:5432/not
     username: skillbox
     password: skillbox
     driver-class-name: org.postgresql.Driver

@@ -108,6 +108,13 @@ public class NotificationServiceImpl implements NotificationService {
         log.info("Creating notification settings for user: {}", id);
         NotificationSettingDto notificationSettingDto = new NotificationSettingDto();
         notificationSettingDto.setUserId(id);
+        notificationSettingDto.setEnableLike(true);
+        notificationSettingDto.setEnablePostComment(true);
+        notificationSettingDto.setEnableFriendRequest(true);
+        notificationSettingDto.setEnableCommentComment(true);
+        notificationSettingDto.setEnableFriendBirthday(true);
+        notificationSettingDto.setEnablePost(true);
+        notificationSettingDto.setEnableMessage(true);
         NotificationSettingEntity settingEntity = mapper.mapToSettingEntity(notificationSettingDto);
         notificationSettingRepository.save(settingEntity);
         return true;

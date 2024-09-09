@@ -134,6 +134,13 @@ public class KafkaMessageService {
     // NEW_USER_REGISTRATION
     public void setNotificationMessageForAuthMicroservice(RegistrationDto registrationDto) {
         NotificationSettingEntity entity = new NotificationSettingEntity();
+        entity.setEnableLike(true);
+        entity.setEnablePostComment(true);
+        entity.setEnableFriendRequest(true);
+        entity.setEnableCommentComment(true);
+        entity.setEnableFriendBirthday(true);
+        entity.setEnablePost(true);
+        entity.setEnableMessage(true);
         entity.setUserId(registrationDto.getUuid());
         notificationSettingRepository.save(entity);
     }
