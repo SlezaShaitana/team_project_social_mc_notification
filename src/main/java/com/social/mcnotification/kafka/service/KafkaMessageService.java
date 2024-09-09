@@ -155,6 +155,7 @@ public class KafkaMessageService {
     public String login() {
         ResponseEntity<AuthenticateResponseDto> response = authClient.login(new AuthenticateDto(email, password));
         AuthenticateResponseDto authenticateResponseDto = response.getBody();
+        log.info("AccessToken: {}, refreshToken: {}", authenticateResponseDto.getAccessToken(), authenticateResponseDto.getRefreshToken());
         return authenticateResponseDto.getAccessToken();
     }
 }
