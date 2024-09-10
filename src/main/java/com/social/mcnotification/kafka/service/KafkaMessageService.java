@@ -104,7 +104,7 @@ public class KafkaMessageService {
         if (notificationDto.getNotificationType() == NotificationType.POST) {
             notifyAllFriends(notificationDto);
         } else {
-            if (userWantsNotification(notificationDto)) {
+            if (userWantsNotification(notificationDto) && notificationDto.getAuthorId() != notificationDto.getReceiverId()) {
                 notificationDto.setIsReaded(false);
                 notificationDto.setSentTime(Timestamp.valueOf(LocalDateTime.now()));
                 NotificationEntity notification = mapper.createNotification(notificationDto);
