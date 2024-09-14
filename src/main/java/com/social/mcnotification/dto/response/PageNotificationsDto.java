@@ -2,12 +2,15 @@ package com.social.mcnotification.dto.response;
 
 import com.social.mcnotification.dto.NotificationsDto;
 import com.social.mcnotification.dto.SortDto;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class PageNotificationsDto {
     private Integer totalPages;
     private Integer totalElements;

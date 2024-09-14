@@ -1,14 +1,13 @@
 package com.social.mcnotification.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @AllArgsConstructor
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@Data
 public class SortDto {
     private boolean empty;
     private boolean unsorted;

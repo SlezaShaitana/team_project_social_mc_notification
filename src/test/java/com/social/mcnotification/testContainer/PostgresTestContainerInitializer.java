@@ -1,4 +1,4 @@
-package com.social.mcnotification;
+package com.social.mcnotification.testContainer;
 
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;

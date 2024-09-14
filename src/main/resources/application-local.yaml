@@ -40,6 +40,12 @@ app:
 
 server:
   port: 8089
+
+
+eureka:
+  client:
+    enabled: false
+
 #eureka:
 #  client:
 #    service-url:

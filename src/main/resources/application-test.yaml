@@ -51,11 +51,7 @@ app:
 
 server:
   port: 8089
-#eureka:
-#  client:
-#    service-url:
-#      defaultZone: http://mc-eureka-conteiner:8888/eureka/
-#    register-with-eureka: true
-#    fetch-registry: true
-#  instance:
-#    preferIpAddress: true
+
+eureka:
+  client:
+    enabled: false

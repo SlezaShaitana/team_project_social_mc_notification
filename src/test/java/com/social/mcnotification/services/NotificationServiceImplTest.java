@@ -37,9 +37,7 @@ import static org.mockito.Mockito.*;
 
 
 @ExtendWith(MockitoExtension.class)
-//@WithMockUser(username = "testuser", roles = {"USER"})
 public class NotificationServiceImplTest {
-
     @MockBean
     private SecurityContext securityContext;
     @MockBean
@@ -73,7 +71,6 @@ public class NotificationServiceImplTest {
 
         // Устанавливаем мок для SecurityContext
         SecurityContextHolder.setContext(securityContext);
-
         lenient().when(securityContext.getAuthentication()).thenReturn(authentication);
         lenient().when(authentication.getName()).thenReturn("testUser");
     }
@@ -88,7 +85,6 @@ public class NotificationServiceImplTest {
         UserModel result = service.getCurrentUser();
         assertEquals(userModel, result);
     }
-
 
     @Test
     @DisplayName("Test getNotificationSetting method")
@@ -118,13 +114,11 @@ public class NotificationServiceImplTest {
 
         NotificationSettingEntity entity = new NotificationSettingEntity();
         entity.setUserId(user.getId());
-
         when(authentication.getPrincipal()).thenReturn(user);
         when(service.getCurrentUser()).thenReturn(user);
         when(notificationSettingRepository.findByUserId(user.getId())).thenReturn(entity);
 
         service.updateNotificationSettings(updateDto);
-
         verify(notificationSettingRepository, times(1)).save(any(NotificationSettingEntity.class));
         verify(notificationSettingRepository, times(1)).findByUserId(user.getId());
 
@@ -135,19 +129,17 @@ public class NotificationServiceImplTest {
     public void testMarkAllEventsAsRead() {
         List<NotificationEntity> entityList = new ArrayList<>();
 
-        for (int i = 1; i <= 5; i ++) {
+        for (int i = 1; i <= 5; i++) {
             NotificationEntity entity = new NotificationEntity();
             entity.setReceiverId(user.getId());
             entity.setAuthorId(UUID.randomUUID());
             entityList.add(entity);
         }
-
         when(authentication.getPrincipal()).thenReturn(user);
         when(service.getCurrentUser()).thenReturn(user);
         when(notificationRepository.findByReceiverId(user.getId())).thenReturn(entityList);
 
         service.markAllEventsAsRead();
-
         verify(notificationRepository, times(1)).saveAll(entityList);
         verify(notificationRepository, times(1)).findByReceiverId(user.getId());
     }
@@ -161,17 +153,14 @@ public class NotificationServiceImplTest {
         notificationSetting.setUserId(idUser);
         when(mapper.mapToSettingEntity(any(NotificationSettingDto.class))).thenReturn(notificationSetting);
         Boolean result = service.createNotificationSettings(idUser);
-
         assertTrue(result);
         verify(notificationSettingRepository, times(1)).save(any(NotificationSettingEntity.class));
     }
 
 
-
     @Test
     @DisplayName("Test createNotification method")
     public void testCreateNotification() {
-
         EventNotificationDto eventNotificationDto = new EventNotificationDto(
                 UUID.randomUUID(),
                 user.getId(),
@@ -180,9 +169,7 @@ public class NotificationServiceImplTest {
 
         when(authentication.getPrincipal()).thenReturn(user);
         when(service.getCurrentUser()).thenReturn(user);
-
         service.createNotification(eventNotificationDto);
-
         verify(notificationRepository, times(1)).save(any(NotificationEntity.class));
     }
 
@@ -192,12 +179,12 @@ public class NotificationServiceImplTest {
     public void testGetEventsCount() {
         List<NotificationEntity> entityList = new ArrayList<>();
 
-        for (int i = 1; i <= 5; i ++) {
+        for (int i = 1; i <= 5; i++) {
             NotificationEntity entity = new NotificationEntity();
             entity.setReceiverId(user.getId());
             entity.setAuthorId(UUID.randomUUID());
             if (i <= 2) {
-            entity.setIsReaded(true);
+                entity.setIsReaded(true);
             } else {
                 entity.setIsReaded(false);
             }
@@ -207,9 +194,7 @@ public class NotificationServiceImplTest {
         when(authentication.getPrincipal()).thenReturn(user);
         when(service.getCurrentUser()).thenReturn(user);
         when(notificationRepository.findByReceiverId(user.getId())).thenReturn(entityList);
-
         NotificationCountDto result = service.getEventsCount();
-
         assertEquals(result.getData().getCount(), 3);
         verify(notificationRepository, times(1)).findByReceiverId(user.getId());
     }
@@ -223,20 +208,14 @@ public class NotificationServiceImplTest {
 
         when(authentication.getPrincipal()).thenReturn(user);
         when(service.getCurrentUser()).thenReturn(user);
-
         List<NotificationEntity> notifications = new ArrayList<>();
         notifications.add(new NotificationEntity());
         notifications.add(new NotificationEntity());
-
         Page<NotificationEntity> pageNotifications = new PageImpl<>(notifications);
-
         when(notificationRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(pageNotifications);
-
         PageNotificationsDto result = service.getNotifications(page, size, sort, headerRequestByAuth);
-
         assertNotNull(result);
         assertEquals(2, result.getContent().length);
         verify(notificationRepository, times(1)).findAll(any(Specification.class), any(Pageable.class));
     }
-
 }
