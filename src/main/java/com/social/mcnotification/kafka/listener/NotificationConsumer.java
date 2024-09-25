@@ -18,9 +18,7 @@ public class NotificationConsumer {
     @KafkaListener(topics = "${spring.kafka.kafkaMessageTopic}", groupId = "${spring.kafka.kafkaMessageGroupId}", containerFactory = "kafkaMessageConcurrentKafkaListenerContainerFactory")
     public void listen(@Payload NotificationDto notificationDto) {
         log.info("Received notification: {}", notificationDto);
-//        ExecutorService executorService = new DelegatingSecurityContextExecutorService(Executors.newSingleThreadExecutor());
         try {
-//            executorService.submit(() -> kafkaMessageService.savingToNotificationRepository(notificationDto));
             kafkaMessageService.savingToNotificationRepository(notificationDto);
             log.info("Notification successfully saved: {}", notificationDto);
         } catch (Exception e) {
